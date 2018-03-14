@@ -1,4 +1,4 @@
-# clw-block-braking - 
+# clw-block-braking - A sample block braking written by Common Lisp as Web application
 
 ## Usage
 
@@ -16,4 +16,4 @@ Copyright (c) 2018 eshamster (hamgoostar@gmail.com)
 
 ## License
 
-Licensed under the  License.
+Licensed under the LLGPL License.

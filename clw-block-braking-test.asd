@@ -10,7 +10,7 @@
 
 (defsystem clw-block-braking-test
   :author "eshamster"
-  :license ""
+  :license "LLGPL"
   :depends-on (:eshamster
                :prove
                :dexador)

@@ -4,7 +4,7 @@
 |#
 
 #|
-  
+  A sample block braking written by Common Lisp as Web application
 
   Author: eshamster (hamgoostar@gmail.com)
 |#
@@ -19,7 +19,7 @@
   :class :package-inferred-system
   :defsystem-depends-on (:asdf-package-system)
   :author "eshamster"
-  :license ""
+  :license "LLGPL"
   :depends-on (:parenscript
                :ps-experiment
                :cl-ps-ecs
@@ -28,7 +28,7 @@
                :cl-markup
                :clack
                :clw-block-braking/src/clw-block-braking)
-  :description ""
+  :description "A sample block braking written by Common Lisp as Web application"
   :long-description
   #.(with-open-file (stream (merge-pathnames
                              #p"README.markdown"
