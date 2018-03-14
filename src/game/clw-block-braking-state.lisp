@@ -3,7 +3,9 @@
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
-  (:export :make-clw-block-braking-start-state))
+  (:export :make-clw-block-braking-start-state)
+  (:import-from :clw-block-braking/src/game/field
+                :init-field))
 (in-package :clw-block-braking/src/game/clw-block-braking-state)
 
 (defstruct.ps+
@@ -12,6 +14,7 @@
                (start-process
                 (lambda (_this)
                   (declare (ignore _this))
+                  (init-field)
                   t))
                (process
                 (lambda (_this)
