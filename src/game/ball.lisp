@@ -32,6 +32,14 @@
         (when (> (+ y r) height)
           (set-entity-param ball :angle (* angle -1)))))))
 
+;; TODO: Reflect when colliding
+(defun.ps+ process-collide (ball target)
+  (check-entity-tags ball :ball)
+  (add-to-event-log (+ "ball collides to: "
+                       (cond ((has-entity-tag target :block) "block")
+                             ((has-entity-tag target :paddle) "paddle")
+                             (t (error "Collides to unknown object."))))))
+
 (defun.ps+ make-ball (field)
   (check-entity-tags field :field)
   (let ((ball (make-ecs-entity))
@@ -43,10 +51,9 @@
      (make-point-2d :x (/ width 2) :y 50)
      (make-model-2d :model (make-solid-circle :r r :color (get-param :ball :color)))
      (make-script-2d :func (lambda (entity) (move-ball entity)))
-     (make-physic-circle :target-tags '(:ball)
+     (make-physic-circle :target-tags '(:block :paddle)
                          :r r
-                         ;; TODO: Reflect when colliding
-                         )
+                         :on-collision #'process-collide)
      (init-entity-params :speed (get-param :ball :speed :init)
                          :angle (/ PI 4)
                          :r r))
