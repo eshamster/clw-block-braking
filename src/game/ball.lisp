@@ -43,6 +43,10 @@
      (make-point-2d :x (/ width 2) :y 50)
      (make-model-2d :model (make-solid-circle :r r :color (get-param :ball :color)))
      (make-script-2d :func (lambda (entity) (move-ball entity)))
+     (make-physic-circle :target-tags '(:ball)
+                         :r r
+                         ;; TODO: Reflect when colliding
+                         )
      (init-entity-params :speed (get-param :ball :speed :init)
                          :angle (/ PI 4)
                          :r r))

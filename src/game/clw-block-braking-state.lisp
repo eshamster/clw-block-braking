@@ -8,7 +8,9 @@
                 :init-field
                 :get-field)
   (:import-from :clw-block-braking/src/game/ball
-                :make-ball))
+                :make-ball)
+  (:import-from :clw-block-braking/src/game/block
+                :make-test-blocks))
 (in-package :clw-block-braking/src/game/clw-block-braking-state)
 
 (defstruct.ps+
@@ -19,7 +21,8 @@
                   (declare (ignore _this))
                   (init-field)
                   (let ((field (get-field)))
-                    (add-ecs-entity-to-buffer (make-ball field) field))
+                    (add-ecs-entity-to-buffer (make-ball field) field)
+                    (make-test-blocks field))
                   t))
                (process
                 (lambda (_this)
@@ -31,8 +34,10 @@
      (:include game-state
                (start-process
                 (lambda (_this)
+                  (declare (ignore _this))
                   ;; TODO: Prevent multiple load
                   (load-font "js/")
+                  (setf-collider-model-enable t)
                   t))
                (process
                 (lambda (_this)
