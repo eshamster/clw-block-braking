@@ -14,11 +14,25 @@
 (defun.ps+ make-test-blocks (field)
   (let ((width (field-width field))
         (height (field-height field)))
-    (dotimes (i 10)
-      (add-ecs-entity
-       (make-rect-block (+ (* width 0.04) (* width 0.08 i)) (* height 0.8)
-                        (* width 0.08) (* height 0.04))
-       field))))
+    (dotimes (y 2)
+      (dotimes (x 10)
+        (when (not (and (= y 0)
+                        (or (= x 7)
+                            (= x 8))))
+          (add-ecs-entity
+           (make-rect-block (+ (* width 0.04) (* width 0.08 x))
+                            (+ (* height 0.7) (* height 0.2 y))
+                            (* width 0.08)
+                            (* height 0.04))
+           field))))
+    (dotimes (y 4)
+      (dotimes (x 2)
+        (add-ecs-entity
+         (make-rect-block (+ (* width 0.04) (* width 0.8 x))
+                          (+ (* height 0.73) (* height 0.04 y))
+                          (* width 0.08)
+                          (* height 0.04))
+         field)))))
 
 (defun.ps+ make-rect-block (x y width height)
   (let ((blk (make-ecs-entity)))
@@ -35,5 +49,7 @@
       :on-collision (lambda (mine target)
                       (when (has-entity-tag target :ball)
                         (register-next-frame-func
-                         (lambda () (delete-ecs-entity mine)))))))
+                         (lambda () (delete-ecs-entity mine))))))
+     (init-entity-params :width width
+                         :height height))
     blk))

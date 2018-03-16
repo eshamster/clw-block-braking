@@ -12,6 +12,17 @@
                 :field-height))
 (in-package :clw-block-braking/src/game/ball)
 
+;; TODO: correct not to sink into
+(defun.ps+ reflect-by-vertical (ball)
+  (check-entity-tags ball :ball)
+  (set-entity-param ball :angle
+                    (- PI (get-entity-param ball :angle))))
+
+(defun.ps+ reflect-by-horizontal (ball)
+  (check-entity-tags ball :ball)
+  (set-entity-param ball :angle
+                    (* (get-entity-param ball :angle) -1)))
+
 (defun.ps+ move-ball (ball)
   (check-entity-tags ball :ball)
   (let* ((field (get-field))
@@ -24,21 +35,63 @@
       (with-slots (x y) point
         (incf x (* speed (cos angle)))
         (incf y (* speed (sin angle)))
-        ;; TODO: correct not to sink into
         (when (> (+ x r) width)
-          (set-entity-param ball :angle (- PI angle)))
+          (reflect-by-vertical ball))
         (when (< (- x r) 0)
-          (set-entity-param ball :angle (- PI angle)))
+          (reflect-by-vertical ball))
         (when (> (+ y r) height)
-          (set-entity-param ball :angle (* angle -1)))))))
+          (reflect-by-horizontal ball))))))
 
-;; TODO: Reflect when colliding
+(defun.ps+ reflect-to-rect (ball rect)
+  (check-entity-tags ball :ball)
+  (let ((ball-pnt (calc-global-point ball))
+        (rect-pnt (calc-global-point rect))
+        (rect-width (get-entity-param rect :width))
+        (rect-height (get-entity-param rect :height)))
+    (flet ((calc-angle-from (target-offset-x target-offset-y)
+             (vector-angle (make-vector-2d
+                            :x (- (vector-2d-x ball-pnt)
+                                  (+ (vector-2d-x rect-pnt) target-offset-x))
+                            :y (- (vector-2d-y ball-pnt)
+                                  (+ (vector-2d-y rect-pnt) target-offset-y))))))
+      ;; a: angle; L: left, R: right, B: bottom, T: Top
+      (let ((a-LB (calc-angle-from 0 0))
+            (a-LT (calc-angle-from 0 rect-height))
+            (a-RT (calc-angle-from rect-width rect-height))
+            (a-RB (calc-angle-from rect-width 0)))
+        (cond
+          ;; collide from bottom of block
+          ((and (>= a-LB (* -3/4 PI)) (<= a-LB 0)
+                (>= a-RB (* -1 PI)) (<= a-RB (* -1/4 PI)))
+           (reflect-by-horizontal ball))
+          ;; collide from top of block
+          ((and (>= a-LT 0) (<= a-LT (* 3/4 PI))
+                (>= a-RT (* 1/4 PI)) (<= a-RT PI))
+           (reflect-by-horizontal ball))
+          ;; collide from left of block
+          ((and (or (and (>= a-LB (* 1/2 PI)) (<= a-LB PI))
+                    (and (>= a-LB (* -1 PI)) (<= a-LB (* -3/4 PI))))
+                (or (and (>= a-LT (* 3/4 PI)) (<= a-LT PI))
+                    (and (>= a-LT (* -1 PI)) (<= a-LT (* -1/2 PI)))))
+           (reflect-by-vertical ball))
+          ;; collide from right of block
+          ((and (>= a-RB (* -1/4 PI)) (<= a-RB (* 1/2 PI))
+                (>= a-RT (* -1/2 PI)) (<= a-RT (* 1/4 PI)))
+           (add-to-event-log "Right")
+           (reflect-by-vertical ball))
+          ;; something wrong...
+          (t (error "The ball collides to rect from unrecognized direction")))))))
+
 (defun.ps+ process-collide (ball target)
   (check-entity-tags ball :ball)
-  (add-to-event-log (+ "ball collides to: "
-                       (cond ((has-entity-tag target :block) "block")
-                             ((has-entity-tag target :paddle) "paddle")
-                             (t (error "Collides to unknown object."))))))
+  (cond ((has-entity-tag target :block)
+         (unless (get-entity-param ball :collided-p)
+           (reflect-to-rect ball target)
+           (set-entity-param ball :collided-p t)))
+        ((has-entity-tag target :paddle)
+         ;; TODO: Reflect when colliding
+         (add-to-event-log "ball collision to paddle"))
+        (t (error "Collides to unknown object."))))
 
 (defun.ps+ make-ball (field)
   (check-entity-tags field :field)
@@ -50,11 +103,14 @@
      ball
      (make-point-2d :x (/ width 2) :y 50)
      (make-model-2d :model (make-solid-circle :r r :color (get-param :ball :color)))
-     (make-script-2d :func (lambda (entity) (move-ball entity)))
+     (make-script-2d :func (lambda (entity)
+                             (set-entity-param entity :collided-p nil)
+                             (move-ball entity)))
      (make-physic-circle :target-tags '(:block :paddle)
                          :r r
                          :on-collision #'process-collide)
      (init-entity-params :speed (get-param :ball :speed :init)
-                         :angle (/ PI 4)
+                         :angle (/ PI 3.9)
+                         :collided-p nil ; reflect once per frame at most
                          :r r))
     ball))
