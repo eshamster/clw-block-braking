@@ -42,12 +42,10 @@
         (when (> (+ y r) height)
           (reflect-by-horizontal ball))))))
 
-(defun.ps+ reflect-to-rect (ball rect)
+;; The rect-pnt is left-bottom point of the rect.
+(defun.ps+ calc-col-direction (ball rect-pnt rect-width rect-height)
   (check-entity-tags ball :ball)
-  (let ((ball-pnt (calc-global-point ball))
-        (rect-pnt (calc-global-point rect))
-        (rect-width (get-entity-param rect :width))
-        (rect-height (get-entity-param rect :height)))
+  (let ((ball-pnt (calc-global-point ball)))
     (flet ((calc-angle-from (target-offset-x target-offset-y)
              (vector-angle (make-vector-2d
                             :x (- (vector-2d-x ball-pnt)
@@ -60,37 +58,57 @@
             (a-RT (calc-angle-from rect-width rect-height))
             (a-RB (calc-angle-from rect-width 0)))
         (cond
-          ;; collide from bottom of block
           ((and (>= a-LB (* -3/4 PI)) (<= a-LB 0)
                 (>= a-RB (* -1 PI)) (<= a-RB (* -1/4 PI)))
-           (reflect-by-horizontal ball))
-          ;; collide from top of block
+           :from-bottom)
           ((and (>= a-LT 0) (<= a-LT (* 3/4 PI))
                 (>= a-RT (* 1/4 PI)) (<= a-RT PI))
-           (reflect-by-horizontal ball))
-          ;; collide from left of block
+           :from-top)
           ((and (or (and (>= a-LB (* 1/2 PI)) (<= a-LB PI))
                     (and (>= a-LB (* -1 PI)) (<= a-LB (* -3/4 PI))))
                 (or (and (>= a-LT (* 3/4 PI)) (<= a-LT PI))
                     (and (>= a-LT (* -1 PI)) (<= a-LT (* -1/2 PI)))))
-           (reflect-by-vertical ball))
-          ;; collide from right of block
+           :from-left)
           ((and (>= a-RB (* -1/4 PI)) (<= a-RB (* 1/2 PI))
                 (>= a-RT (* -1/2 PI)) (<= a-RT (* 1/4 PI)))
-           (add-to-event-log "Right")
-           (reflect-by-vertical ball))
+           :from-right)
           ;; something wrong...
           (t (error "The ball collides to rect from unrecognized direction")))))))
+
+(defun.ps+ reflect-to-block (ball block)
+  (check-entity-tags ball :ball)
+  (check-entity-tags block :block)
+  (let ((block-pnt (calc-global-point block))
+        (block-width (get-entity-param block :width))
+        (block-height (get-entity-param block :height)))
+    (ecase (calc-col-direction ball block-pnt block-width block-height)
+      ((:from-left :from-right) (reflect-by-vertical ball))
+      ((:from-top :from-bottom) (reflect-by-horizontal ball)))))
+
+;; TODO: Adjust angle according to the collision point
+(defun.ps+ reflect-to-paddle (ball paddle)
+  (check-entity-tags ball :ball)
+  (check-entity-tags paddle :paddle)
+  (let* ((width (get-entity-param paddle :width))
+         (height (get-entity-param paddle :height))
+         (paddle-pnt (decf-vector (calc-global-point paddle)
+                                  (make-vector-2d :x (/ width 2)
+                                                  :y (/ height 2)))))
+    (ecase (calc-col-direction ball paddle-pnt width height)
+      ((:from-left :from-right)
+       (reflect-by-vertical ball)
+       (reflect-by-horizontal ball))
+      ((:from-top :from-bottom)
+       (reflect-by-horizontal ball)))))
 
 (defun.ps+ process-collide (ball target)
   (check-entity-tags ball :ball)
   (cond ((has-entity-tag target :block)
          (unless (get-entity-param ball :collided-p)
-           (reflect-to-rect ball target)
+           (reflect-to-block ball target)
            (set-entity-param ball :collided-p t)))
         ((has-entity-tag target :paddle)
-         ;; TODO: Reflect when colliding
-         (add-to-event-log "ball collision to paddle"))
+         (reflect-to-paddle ball target))
         (t (error "Collides to unknown object."))))
 
 (defun.ps+ make-ball (field)
