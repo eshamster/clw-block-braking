@@ -4,7 +4,8 @@
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :make-rect-block
-           :make-paddle)
+           :make-paddle
+           :get-paddle-pnt)
   (:import-from :clw-block-braking/src/game/parameter
                 :get-param)
   (:import-from :clw-block-braking/src/game/field
@@ -23,6 +24,13 @@
             (cond ((> (+ mouse-x half-width) field-width) (- field-width half-width))
                   ((< (- mouse-x half-width) 0) half-width)
                   (t mouse-x))))))
+
+(defun.ps+ get-paddle-pnt (paddle)
+  (check-entity-tags paddle :paddle)
+  (let ((result (calc-global-point paddle)))
+    (decf (point-2d-x result) (/ (get-entity-param paddle :width) 2))
+    (decf (point-2d-y result) (/ (get-entity-param paddle :height) 2))
+    result))
 
 (defun.ps+ make-paddle (field)
   (let* ((paddle (make-ecs-entity))

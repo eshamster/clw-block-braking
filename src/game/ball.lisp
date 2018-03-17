@@ -9,7 +9,9 @@
   (:import-from :clw-block-braking/src/game/field
                 :get-field
                 :field-width
-                :field-height))
+                :field-height)
+  (:import-from :clw-block-braking/src/game/paddle
+                :get-paddle-pnt))
 (in-package :clw-block-braking/src/game/ball)
 
 ;; TODO: correct not to sink into
@@ -82,9 +84,7 @@
   (check-entity-tags paddle :paddle)
   (let* ((width (get-entity-param paddle :width))
          (height (get-entity-param paddle :height))
-         (paddle-pnt (decf-vector (calc-global-point paddle)
-                                  (make-vector-2d :x (/ width 2)
-                                                  :y (/ height 2)))))
+         (paddle-pnt (get-paddle-pnt paddle)))
     (ecase (calc-col-direction ball paddle-pnt width height)
       ((:from-left :from-right)
        (reflect-by-vertical ball)
@@ -95,14 +95,16 @@
 (defun.ps+ process-collide (ball target)
   (check-entity-tags ball :ball)
   (cond ((has-entity-tag target :block)
-         (unless (get-entity-param ball :collided-p)
+         (unless (get-entity-param ball :col-to-block-p)
            (reflect-to-block ball target)
-           (set-entity-param ball :collided-p t)))
+           (set-entity-param ball :col-to-block-p t)))
         ((has-entity-tag target :paddle)
-         (reflect-to-paddle ball target))
+         (when (get-entity-param ball :enable-col-to-paddle-p)
+           (reflect-to-paddle ball target)
+           (set-entity-param ball :enable-col-to-paddle-p nil)))
         (t (error "Collides to unknown object."))))
 
-(defun.ps+ make-ball (field)
+(defun.ps+ make-ball (field paddle)
   (check-entity-tags field :field)
   (let ((ball (make-ecs-entity))
         (width (field-width field))
@@ -113,13 +115,19 @@
      (make-point-2d :x (/ width 2) :y 50)
      (make-model-2d :model (make-solid-circle :r r :color (get-param :ball :color)))
      (make-script-2d :func (lambda (entity)
-                             (set-entity-param entity :collided-p nil)
+                             (set-entity-param entity :col-to-block-p nil)
+                             (when (> (- (vector-2d-y (calc-global-point entity))
+                                         (get-entity-param entity :r))
+                                      (+ (vector-2d-y (get-paddle-pnt paddle))
+                                         (get-entity-param paddle :height)))
+                               (set-entity-param entity :enable-col-to-paddle-p t))
                              (move-ball entity)))
      (make-physic-circle :target-tags '(:block :paddle)
                          :r r
                          :on-collision #'process-collide)
      (init-entity-params :speed (get-param :ball :speed :init)
                          :angle (/ PI 3.9)
-                         :collided-p nil ; reflect once per frame at most
+                         :col-to-block-p nil ; reflect once per frame at most
+                         :enable-col-to-paddle-p t
                          :r r))
     ball))
