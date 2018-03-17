@@ -45,35 +45,26 @@
 ;; The rect-pnt is left-bottom point of the rect.
 (defun.ps+ calc-col-direction (ball rect-pnt rect-width rect-height)
   (check-entity-tags ball :ball)
-  (let ((ball-pnt (calc-global-point ball)))
-    (flet ((calc-angle-from (target-offset-x target-offset-y)
-             (vector-angle (make-vector-2d
-                            :x (- (vector-2d-x ball-pnt)
-                                  (+ (vector-2d-x rect-pnt) target-offset-x))
-                            :y (- (vector-2d-y ball-pnt)
-                                  (+ (vector-2d-y rect-pnt) target-offset-y))))))
-      ;; a: angle; L: left, R: right, B: bottom, T: Top
-      (let ((a-LB (calc-angle-from 0 0))
-            (a-LT (calc-angle-from 0 rect-height))
-            (a-RT (calc-angle-from rect-width rect-height))
-            (a-RB (calc-angle-from rect-width 0)))
-        (cond
-          ((and (>= a-LB (* -3/4 PI)) (<= a-LB 0)
-                (>= a-RB (* -1 PI)) (<= a-RB (* -1/4 PI)))
-           :from-bottom)
-          ((and (>= a-LT 0) (<= a-LT (* 3/4 PI))
-                (>= a-RT (* 1/4 PI)) (<= a-RT PI))
-           :from-top)
-          ((and (or (and (>= a-LB (* 1/2 PI)) (<= a-LB PI))
-                    (and (>= a-LB (* -1 PI)) (<= a-LB (* -3/4 PI))))
-                (or (and (>= a-LT (* 3/4 PI)) (<= a-LT PI))
-                    (and (>= a-LT (* -1 PI)) (<= a-LT (* -1/2 PI)))))
-           :from-left)
-          ((and (>= a-RB (* -1/4 PI)) (<= a-RB (* 1/2 PI))
-                (>= a-RT (* -1/2 PI)) (<= a-RT (* 1/4 PI)))
-           :from-right)
-          ;; something wrong...
-          (t (error "The ball collides to rect from unrecognized direction")))))))
+  (let* ((ball-pnt (calc-global-point ball))
+         (ball-x (vector-2d-x ball-pnt))
+         (ball-y (vector-2d-y ball-pnt))
+         (rect-x (vector-2d-x rect-pnt))
+         (rect-y (vector-2d-y rect-pnt))
+         ;; opz = outer product z
+         (opz1 (calc-outer-product-z
+                (make-vector-2d :x rect-width :y rect-height)
+                (make-vector-2d :x (- ball-x rect-x) :y (- ball-y rect-y))))
+         (opz2 (calc-outer-product-z
+                (make-vector-2d :x rect-width :y (* -1 rect-height))
+                (make-vector-2d :x (- ball-x rect-x)
+                                :y (- ball-y (+ rect-y rect-height))))))
+    (cond ((>= (* opz1 opz2) 0)
+           (if (>= opz1 0)
+               :from-top
+               :from-bottom))
+          (t (if (>= opz1 0)
+                 :from-left
+                 :from-right)))))
 
 (defun.ps+ reflect-to-block (ball block)
   (check-entity-tags ball :ball)
