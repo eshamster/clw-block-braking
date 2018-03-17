@@ -25,7 +25,7 @@
   (set-entity-param ball :angle
                     (* (get-entity-param ball :angle) -1)))
 
-(defun.ps+ move-ball (ball)
+(defun.ps+ move-ball-normally (ball)
   (check-entity-tags ball :ball)
   (let* ((field (get-field))
          (width (field-width field))
@@ -43,6 +43,34 @@
           (reflect-by-vertical ball))
         (when (> (+ y r) height)
           (reflect-by-horizontal ball))))))
+
+(defun.ps+ move-ball-on-paddle (ball)
+  (check-entity-tags ball :ball)
+  (let* ((paddle (get-entity-param ball :paddle))
+         (paddle-pnt (get-paddle-pnt paddle)))
+    (with-ecs-components ((pnt point-2d)) ball
+      (let* ((global-pnt (make-point-2d
+                          :x (+ (point-2d-x paddle-pnt)
+                                (/ (get-entity-param paddle :width) 2))
+                          :y (+ (point-2d-y paddle-pnt)
+                                (get-entity-param paddle :height)
+                                (get-entity-param ball :r)
+                                (get-param :ball :dist-from-paddle))))
+             (local-pnt (calc-local-point ball global-pnt)))
+        (setf (point-2d-x pnt) (point-2d-x local-pnt))
+        (setf (point-2d-y pnt) (point-2d-y local-pnt))))))
+
+(defun.ps+ shoot-ball (ball)
+  (set-entity-param ball :on-paddle-p nil))
+
+(defun.ps+ move-ball (ball)
+  (check-entity-tags ball :ball)
+  ;; TODO: split the input process to another package
+  (when (= (get-left-mouse-state) :down-now)
+    (shoot-ball ball))
+  (if (get-entity-param ball :on-paddle-p)
+      (move-ball-on-paddle ball)
+      (move-ball-normally ball)))
 
 ;; The rect-pnt is left-bottom point of the rect.
 (defun.ps+ calc-col-direction (ball rect-pnt rect-width rect-height)
@@ -129,5 +157,7 @@
                          :angle (/ PI 3.9)
                          :col-to-block-p nil ; reflect once per frame at most
                          :enable-col-to-paddle-p t
+                         :on-paddle-p t
+                         :paddle paddle
                          :r r))
     ball))

@@ -9,7 +9,9 @@
   (convert-to-layered-hash
    (:field (:x 190 :y 20 :width 420 :height 560 :depth 0)
     :ball (:r 5 :color #xffaaaa
-           :speed (:init 3))
+           :speed (:init 3)
+           :angle (:min (/ PI 7) :max-accele (/ PI 16))
+           :dist-from-paddle 5)
     :paddle (:width 40 :height 6 :depth 8))))
 
 (defmacro.ps+ get-param (&rest keys)
