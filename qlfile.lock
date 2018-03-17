@@ -19,7 +19,7 @@
 ("cl-web-2d-game" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "cl-web-2d-game" :repos "eshamster/cl-web-2d-game" :ref nil :branch nil :tag nil)
-  :version "github-dba73abd45d207ab20ea96984313b2ff33310f0b"
+  :version "github-b3d7e9cfb7ca03baca7bbd619eee6e9ef6291d90"
   :repos "eshamster/cl-web-2d-game"
-  :url "https://github.com/eshamster/cl-web-2d-game/archive/dba73abd45d207ab20ea96984313b2ff33310f0b.tar.gz"
-  :ref "dba73abd45d207ab20ea96984313b2ff33310f0b"))
+  :url "https://github.com/eshamster/cl-web-2d-game/archive/b3d7e9cfb7ca03baca7bbd619eee6e9ef6291d90.tar.gz"
+  :ref "b3d7e9cfb7ca03baca7bbd619eee6e9ef6291d90"))
