@@ -120,7 +120,26 @@
       ((:from-left :from-right) (reflect-by-vertical ball))
       ((:from-top :from-bottom) (reflect-by-horizontal ball)))))
 
-;; TODO: Adjust angle according to the collision point
+;; Note: This assumes that it will be called after reflection procedure.
+(defun.ps+ adjust-angle-by-paddle (ball paddle)
+  (let* ((paddle-width (get-entity-param paddle :width))
+         (paddle-pnt (get-paddle-global-pnt paddle))
+         (ball-pnt (calc-global-point ball))
+         (diff-x (- (point-2d-x ball-pnt)
+                    (+ (point-2d-x paddle-pnt) (/ paddle-width 2))))
+         (changed-angle (* (get-param :ball :angle :max-accele)
+                           (max -1
+                                (min 1 (/ diff-x (/ paddle-width 2))))))
+         (min-angle-abs (get-param :ball :angle :min)))
+    (set-entity-param ball :angle
+                      (max min-angle-abs
+                           (min (- PI min-angle-abs)
+                                ;; diff-angle is used for normalization
+                                (diff-angle
+                                 (- (get-entity-param ball :angle)
+                                    changed-angle)
+                                 0))))))
+
 (defun.ps+ reflect-to-paddle (ball paddle)
   (check-entity-tags ball :ball)
   (check-entity-tags paddle :paddle)
@@ -132,7 +151,8 @@
        (reflect-by-vertical ball)
        (reflect-by-horizontal ball))
       ((:from-top :from-bottom)
-       (reflect-by-horizontal ball)))))
+       (reflect-by-horizontal ball)))
+    (adjust-angle-by-paddle ball paddle)))
 
 (defun.ps+ process-collide (ball target)
   (check-entity-tags ball :ball)
