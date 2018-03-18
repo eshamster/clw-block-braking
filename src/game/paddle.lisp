@@ -5,7 +5,8 @@
         :cl-web-2d-game)
   (:export :make-rect-block
            :make-paddle
-           :get-paddle-pnt)
+           :get-paddle-pnt
+           :move-paddle-to)
   (:import-from :clw-block-braking/src/game/parameter
                 :get-param)
   (:import-from :clw-block-braking/src/game/field
@@ -13,17 +14,20 @@
                 :field-height))
 (in-package :clw-block-braking/src/game/paddle)
 
-(defun.ps+ move-paddle-by-mouse (paddle field)
+(defun.ps+ move-paddle-to (paddle global-x)
   (check-entity-tags paddle :paddle)
   (with-ecs-components ((point point-2d)) paddle
-    (let ((mouse-x (- (get-mouse-x) (point-2d-x (calc-global-point field))))
-          (field-width (field-width field))
-          (field-height (field-height field))
-          (half-width (/ (get-entity-param paddle :width) 2)))
+    (let* ((field (get-entity-param paddle :field))
+           (global-pnt (calc-global-point paddle))
+           (center-x (point-2d-x
+                      (calc-local-point
+                       paddle (make-point-2d :x global-x :y (point-2d-y global-pnt)))))
+           (field-width (field-width field))
+           (half-width (/ (get-entity-param paddle :width) 2)))
       (setf (point-2d-x point)
-            (cond ((> (+ mouse-x half-width) field-width) (- field-width half-width))
-                  ((< (- mouse-x half-width) 0) half-width)
-                  (t mouse-x))))))
+            (cond ((> (+ center-x half-width) field-width) (- field-width half-width))
+                  ((< (- center-x half-width) 0) half-width)
+                  (t center-x))))))
 
 (defun.ps+ get-paddle-pnt (paddle)
   (check-entity-tags paddle :paddle)
@@ -53,8 +57,7 @@
                       (make-point-2d :x       half-width  :y (* -1 half-height))
                       (make-point-2d :x       half-width  :y       half-height)
                       (make-point-2d :x (* -1 half-width) :y       half-height)))
-     (make-script-2d :func (lambda (_this) 
-                             (move-paddle-by-mouse _this field)))
      (init-entity-params :width width
-                         :height height))
+                         :height height
+                         :field field))
     paddle))

@@ -12,6 +12,8 @@
                 :reset-ball)
   (:import-from :clw-block-braking/src/game/block
                 :make-test-blocks)
+  (:import-from :clw-block-braking/src/game/controller
+                :init-controller)
   (:import-from :clw-block-braking/src/game/life
                 :add-life-decrease-event
                 :get-rest-life
@@ -33,6 +35,7 @@
                     (add-ecs-entity-to-buffer paddle field)
                     (add-ecs-entity-to-buffer ball field)
                     (make-test-blocks field)
+                    (init-controller)
                     ;; life
                     (init-life)
                     (add-life-decrease-event

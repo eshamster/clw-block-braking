@@ -5,7 +5,8 @@
         :cl-web-2d-game)
   (:export :make-ball
            :reset-ball
-           :add-ball-falling-event)
+           :add-ball-falling-event
+           :shoot-ball)
   (:import-from :clw-block-braking/src/game/parameter
                 :get-param)
   (:import-from :clw-block-braking/src/game/field
@@ -81,9 +82,6 @@
 
 (defun.ps+ move-ball (ball)
   (check-entity-tags ball :ball)
-  ;; TODO: split the input process to another package
-  (when (= (get-left-mouse-state) :down-now)
-    (shoot-ball ball))
   (if (get-entity-param ball :on-paddle-p)
       (move-ball-on-paddle ball)
       (move-ball-normally ball)))
