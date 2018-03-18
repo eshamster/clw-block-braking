@@ -20,9 +20,10 @@
 ;; --- others --- ;;
 
 (defvar.ps+ *rest-life* -1)
+(defvar.ps+ *init-life* 2)
 
 (defun.ps+ init-life ()
-  (setf *rest-life* 2)
+  (setf *rest-life* *init-life*)
   (add-ball-falling-event
    :decrease-life
    (lambda (ball)
