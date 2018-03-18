@@ -5,7 +5,7 @@
         :cl-web-2d-game)
   (:export :make-rect-block
            :make-paddle
-           :get-paddle-pnt
+           :get-paddle-global-pnt
            :move-paddle-to)
   (:import-from :clw-block-braking/src/game/parameter
                 :get-param)
@@ -29,7 +29,7 @@
                   ((< (- center-x half-width) 0) half-width)
                   (t center-x))))))
 
-(defun.ps+ get-paddle-pnt (paddle)
+(defun.ps+ get-paddle-global-pnt (paddle)
   (check-entity-tags paddle :paddle)
   (let ((result (calc-global-point paddle)))
     (decf (point-2d-x result) (/ (get-entity-param paddle :width) 2))

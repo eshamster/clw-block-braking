@@ -14,7 +14,7 @@
                 :field-width
                 :field-height)
   (:import-from :clw-block-braking/src/game/paddle
-                :get-paddle-pnt))
+                :get-paddle-global-pnt))
 (in-package :clw-block-braking/src/game/ball)
 
 (defvar.ps+ *ball-falling-event* (make-hash-table))
@@ -64,7 +64,7 @@
 (defun.ps+ move-ball-on-paddle (ball)
   (check-entity-tags ball :ball)
   (let* ((paddle (get-entity-param ball :paddle))
-         (paddle-pnt (get-paddle-pnt paddle)))
+         (paddle-pnt (get-paddle-global-pnt paddle)))
     (with-ecs-components ((pnt point-2d)) ball
       (let* ((global-pnt (make-point-2d
                           :x (+ (point-2d-x paddle-pnt)
@@ -87,13 +87,13 @@
       (move-ball-normally ball)))
 
 ;; The rect-pnt is left-bottom point of the rect.
-(defun.ps+ calc-col-direction (ball rect-pnt rect-width rect-height)
+(defun.ps+ calc-col-direction (ball rect-global-pnt rect-width rect-height)
   (check-entity-tags ball :ball)
   (let* ((ball-pnt (calc-global-point ball))
          (ball-x (vector-2d-x ball-pnt))
          (ball-y (vector-2d-y ball-pnt))
-         (rect-x (vector-2d-x rect-pnt))
-         (rect-y (vector-2d-y rect-pnt))
+         (rect-x (vector-2d-x rect-global-pnt))
+         (rect-y (vector-2d-y rect-global-pnt))
          ;; opz = outer product z
          (opz1 (calc-outer-product-z
                 (make-vector-2d :x rect-width :y rect-height)
@@ -126,7 +126,7 @@
   (check-entity-tags paddle :paddle)
   (let* ((width (get-entity-param paddle :width))
          (height (get-entity-param paddle :height))
-         (paddle-pnt (get-paddle-pnt paddle)))
+         (paddle-pnt (get-paddle-global-pnt paddle)))
     (ecase (calc-col-direction ball paddle-pnt width height)
       ((:from-left :from-right)
        (reflect-by-vertical ball)
@@ -160,7 +160,7 @@
                              (set-entity-param entity :col-to-block-p nil)
                              (when (> (- (vector-2d-y (calc-global-point entity))
                                          (get-entity-param entity :r))
-                                      (+ (vector-2d-y (get-paddle-pnt paddle))
+                                      (+ (vector-2d-y (get-paddle-global-pnt paddle))
                                          (get-entity-param paddle :height)))
                                (set-entity-param entity :enable-col-to-paddle-p t))
                              (move-ball entity)))
