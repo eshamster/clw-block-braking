@@ -42,7 +42,10 @@
         (when (< (- x r) 0)
           (reflect-by-vertical ball))
         (when (> (+ y r) height)
-          (reflect-by-horizontal ball))))))
+          (reflect-by-horizontal ball))
+        ;; TODO: Move trigerring reset-ball to more proper package
+        (when (< (+ y r) 0)
+          (reset-ball ball))))))
 
 (defun.ps+ move-ball-on-paddle (ball)
   (check-entity-tags ball :ball)
@@ -159,5 +162,16 @@
                          :enable-col-to-paddle-p t
                          :on-paddle-p t
                          :paddle paddle
+                         :field field
                          :r r))
     ball))
+
+(defun.ps+ reset-ball (ball)
+  (check-entity-tags ball :ball)
+  (let ((field (get-entity-param ball :field))
+        (paddle (get-entity-param ball :paddle)))
+    (register-next-frame-func
+     (lambda ()
+       (delete-ecs-entity ball)
+       (add-ecs-entity (make-ball field paddle)
+                       field)))))
