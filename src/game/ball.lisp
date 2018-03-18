@@ -3,7 +3,9 @@
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
-  (:export :make-ball)
+  (:export :make-ball
+           :reset-ball
+           :add-ball-falling-event)
   (:import-from :clw-block-braking/src/game/parameter
                 :get-param)
   (:import-from :clw-block-braking/src/game/field
@@ -13,6 +15,11 @@
   (:import-from :clw-block-braking/src/game/paddle
                 :get-paddle-pnt))
 (in-package :clw-block-braking/src/game/ball)
+
+(defvar.ps+ *ball-falling-event* (make-hash-table))
+
+(defun.ps+ add-ball-falling-event (name func)
+  (setf (gethash name *ball-falling-event*) func))
 
 ;; TODO: correct not to sink into
 (defun.ps+ reflect-by-vertical (ball)
@@ -37,15 +44,21 @@
       (with-slots (x y) point
         (incf x (* speed (cos angle)))
         (incf y (* speed (sin angle)))
+        ;; reflect
         (when (> (+ x r) width)
           (reflect-by-vertical ball))
         (when (< (- x r) 0)
           (reflect-by-vertical ball))
         (when (> (+ y r) height)
           (reflect-by-horizontal ball))
-        ;; TODO: Move trigerring reset-ball to more proper package
-        (when (< (+ y r) 0)
-          (reset-ball ball))))))
+        ;; fall
+        (when (and (< (+ y r) 0)
+                   (not (get-entity-param ball :fallen-p)))
+          (set-entity-param ball :fallen-p t)
+          (maphash (lambda (name func)
+                     (declare (ignore name))
+                     (funcall func ball))
+                   *ball-falling-event*))))))
 
 (defun.ps+ move-ball-on-paddle (ball)
   (check-entity-tags ball :ball)
@@ -163,6 +176,7 @@
                          :on-paddle-p t
                          :paddle paddle
                          :field field
+                         :fallen-p nil
                          :r r))
     ball))
 

@@ -8,9 +8,14 @@
                 :init-field
                 :get-field)
   (:import-from :clw-block-braking/src/game/ball
-                :make-ball)
+                :make-ball
+                :reset-ball)
   (:import-from :clw-block-braking/src/game/block
                 :make-test-blocks)
+  (:import-from :clw-block-braking/src/game/life
+                :add-life-decrease-event
+                :get-rest-life
+                :init-life)
   (:import-from :clw-block-braking/src/game/paddle
                 :make-paddle))
 (in-package :clw-block-braking/src/game/clw-block-braking-state)
@@ -23,14 +28,25 @@
                   (declare (ignore _this))
                   (init-field)
                   (let*  ((field (get-field))
-                          (paddle (make-paddle field)))
+                          (paddle (make-paddle field))
+                          (ball (make-ball field paddle)))
                     (add-ecs-entity-to-buffer paddle field)
-                    (add-ecs-entity-to-buffer (make-ball field paddle) field)
-                    (make-test-blocks field))
+                    (add-ecs-entity-to-buffer ball field)
+                    (make-test-blocks field)
+                    ;; life
+                    (init-life)
+                    (add-life-decrease-event
+                     :reset-or-gameover
+                     (lambda (rest-life)
+                       (when (>= rest-life 0)
+                         (let ((fallen-ball (find-a-entity-by-tag :ball)))
+                           (assert fallen-ball)
+                           (reset-ball fallen-ball))))))
                   t))
                (process
                 (lambda (_this)
                   (declare (ignore _this))
+                  (add-to-monitoring-log (+ "Life: " (get-rest-life)))
                   nil)))))
 
 (defstruct.ps+
