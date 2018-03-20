@@ -10,8 +10,8 @@
   (:import-from :clw-block-braking/src/game/ball
                 :make-ball
                 :reset-ball)
-  (:import-from :clw-block-braking/src/game/block
-                :make-test-blocks)
+  (:import-from :clw-block-braking/src/game/stage-generator
+                :make-test-stage)
   (:import-from :clw-block-braking/src/game/controller
                 :init-controller)
   (:import-from :clw-block-braking/src/game/life
@@ -27,14 +27,13 @@
      (:include game-state
                (start-process
                 (lambda (_this)
-                  (declare (ignore _this))
                   (init-field)
                   (let*  ((field (get-field))
                           (paddle (make-paddle field))
                           (ball (make-ball field paddle)))
                     (add-ecs-entity-to-buffer paddle field)
                     (add-ecs-entity-to-buffer ball field)
-                    (make-test-blocks field)
+                    (make-test-stage field)
                     (init-controller)
                     ;; life
                     (init-life)
