@@ -3,13 +3,10 @@
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
-  (:export :make-test-stage)
+  (:export :generate-stage)
   (:import-from :clw-block-braking/src/game/block
                 :make-rect-block))
 (in-package :clw-block-braking/src/game/stage-generator)
-
-(defun.ps+ make-test-stage (field)
-  (interpret-stage *stage1* field))
 
 (defstruct.ps+ block-info name width height)
 
@@ -17,7 +14,10 @@
 (defvar.ps+ *block-list*
     (list (make-block-info :name :block1
                            :width 0.07
-                           :height 0.025)))
+                           :height 0.025)
+          (make-block-info :name :super-wide-block
+                           :width 0.9
+                           :height 0.05)))
 
 ;; Note: x and y is relative value to block size
 (defvar.ps+
@@ -28,6 +28,11 @@
                             (:min (1 5) :max (11 5) :step (3 1))
                             (:min (0.5 8) :max (11.5 9) :step (2 1))
                             (:min (0 11) :max (11 11) :step (1 1)))))))
+
+(defvar.ps+
+    *test-stage*
+    '(:blocks ((:info (:name :super-wide-block :offset-x 0.05 :offset-y 10)
+                :sequences ((:min (0 0) :max (0 0) :step (1 1)))))))
 
 ;; Note: x and y is relative value to block size
 (defun.ps+ make-block-using-info (name x y field)
@@ -41,7 +46,7 @@
                      (block-info-height info))))
       (make-rect-block (* width x) (* height y) width height))))
 
-(defun.ps+ interpret-stage (stage-info field)
+(defun.ps+ generate-stage (stage-info field)
   (dolist (cluster (getf stage-info :blocks))
     (let* ((info (getf cluster :info))
            (name (getf info :name))

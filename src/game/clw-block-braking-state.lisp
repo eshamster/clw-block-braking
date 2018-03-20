@@ -11,7 +11,7 @@
                 :make-ball
                 :reset-ball)
   (:import-from :clw-block-braking/src/game/stage-generator
-                :make-test-stage)
+                :generate-stage)
   (:import-from :clw-block-braking/src/game/controller
                 :init-controller)
   (:import-from :clw-block-braking/src/game/life
@@ -27,24 +27,17 @@
      (:include game-state
                (start-process
                 (lambda (_this)
-                  (init-field)
-                  (let*  ((field (get-field))
-                          (paddle (make-paddle field))
-                          (ball (make-ball field paddle)))
-                    (add-ecs-entity-to-buffer paddle field)
-                    (add-ecs-entity-to-buffer ball field)
-                    (make-test-stage field)
-                    (init-controller)
-                    ;; life
-                    (init-life)
-                    (add-life-decrease-event
-                     :reset-or-gameover
-                     (lambda (rest-life)
-                       (if (>= rest-life 0)
-                           (let ((fallen-ball (find-a-entity-by-tag :ball)))
-                             (assert fallen-ball)
-                             (reset-ball fallen-ball))
-                           (setf (clw-block-braking-main-state-gameover-p _this) t)))))
+                  (let*  ((field (get-field)))
+                    (generate-stage (clw-block-braking-main-state-stage-info _this)
+                                    field))
+                  (add-life-decrease-event
+                   :reset-or-gameover
+                   (lambda (rest-life)
+                     (if (>= rest-life 0)
+                         (let ((fallen-ball (find-a-entity-by-tag :ball)))
+                           (assert fallen-ball)
+                           (reset-ball fallen-ball))
+                         (setf (clw-block-braking-main-state-gameover-p _this) t))))
                   t))
                (process
                 (lambda (_this)
@@ -52,10 +45,30 @@
                   (if (clw-block-braking-main-state-gameover-p _this)
                       (make-clw-block-braking-gameover-state)
                       nil)))))
+    stage-info
     (gameover-p nil))
 
 (defstruct.ps+
-    (clw-block-braking-start-state
+    (clw-block-braking-init-state
+     (:include game-state
+               (start-process
+                (lambda (_this)
+                  (declare (ignore _this))
+                  (init-field)
+                  (init-controller)
+                  (init-life)
+                  (let*  ((field (get-field))
+                          (paddle (make-paddle field))
+                          (ball (make-ball field paddle)))
+                    (add-ecs-entity-to-buffer paddle field)
+                    (add-ecs-entity-to-buffer ball field))
+                  t))
+               (process
+                (lambda (_this)
+                  (declare (ignore _this))
+                  (make-clw-block-braking-main-state
+                   :stage-info clw-block-braking/src/game/stage-generator::*test-stage*))))))
+
 (defstruct.ps+
     (clw-block-braking-menu-state
      (:include game-state
@@ -81,7 +94,7 @@
                 (lambda (_this)
                   (declare (ignore _this))
                   (when (eq (get-left-mouse-state) :down-now)
-                    (make-clw-block-braking-main-state))))
+                    (make-clw-block-braking-init-state))))
                (end-process
                 (lambda (_this)
                   (declare (ignore _this))
