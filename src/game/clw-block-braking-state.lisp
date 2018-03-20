@@ -3,7 +3,7 @@
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
-  (:export :make-clw-block-braking-start-state)
+  (:export :make-clw-block-braking-menu-state)
   (:import-from :clw-block-braking/src/game/field
                 :init-field
                 :get-field)
@@ -56,6 +56,8 @@
 
 (defstruct.ps+
     (clw-block-braking-start-state
+(defstruct.ps+
+    (clw-block-braking-menu-state
      (:include game-state
                (start-process
                 (lambda (_this)
@@ -108,7 +110,7 @@
                 (lambda (_this)
                   (declare (ignore _this))
                   (when (eq (get-left-mouse-state) :down-now)
-                    (make-clw-block-braking-start-state))))
+                    (make-clw-block-braking-menu-state))))
                (end-process
                 (lambda (_this)
                   (with-slots (first-frame) _this
