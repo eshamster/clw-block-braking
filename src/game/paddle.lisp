@@ -6,13 +6,29 @@
   (:export :make-rect-block
            :make-paddle
            :get-paddle-global-pnt
-           :move-paddle-to)
+           :move-paddle-to
+           :change-paddle-lane)
   (:import-from :clw-block-braking/src/game/parameter
                 :get-param)
   (:import-from :clw-block-braking/src/game/field
                 :field-width
                 :field-height))
 (in-package :clw-block-braking/src/game/paddle)
+
+(defun.ps+ change-paddle-lane (paddle up-p)
+  (check-entity-tags paddle :paddle)
+  (let ((lane (get-entity-param paddle :lane))
+        (lane-count (get-param :paddle :lane-count)))
+    (incf lane (if up-p 1 -1))
+    (when (>= lane lane-count)
+      (setf lane (1- lane-count)))
+    (when (< lane 0)
+      (setf lane 0))
+    (setf (point-2d-y (get-ecs-component 'point-2d paddle))
+          (+ (get-param :paddle :base-line-height)
+             (* (get-param :paddle :lane-space)
+                lane)))
+    (set-entity-param paddle :lane lane)))
 
 (defun.ps+ move-paddle-to (paddle global-x)
   (check-entity-tags paddle :paddle)
@@ -39,7 +55,7 @@
 (defun.ps+ make-paddle (field)
   (let* ((paddle (make-ecs-entity))
          (x (* (field-width field) 0.5))
-         (y (* (field-height field) 0.1))
+         (y (get-param :paddle :base-line-height))
          (width (get-param :paddle :width))
          (half-width (/ width 2))
          (height (get-param :paddle :height))
@@ -59,5 +75,6 @@
                       (make-point-2d :x (* -1 half-width) :y       half-height)))
      (init-entity-params :width width
                          :height height
-                         :field field))
+                         :field field
+                         :lane 0))
     paddle))

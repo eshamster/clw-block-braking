@@ -7,7 +7,8 @@
   (:import-from :clw-block-braking/src/game/ball
                 :shoot-ball)
   (:import-from :clw-block-braking/src/game/paddle
-                :move-paddle-to))
+                :move-paddle-to
+                :change-paddle-lane))
 (in-package :clw-block-braking/src/game/controller)
 
 (defun.ps+ init-controller ()
@@ -20,6 +21,9 @@
               (declare (ignore _))
               (when (= (get-left-mouse-state) :down-now)
                 (shoot-ball (find-a-entity-by-tag :ball)))
-              (move-paddle-to (find-a-entity-by-tag :paddle)
-                              (get-mouse-x)))))
+              (let ((paddle (find-a-entity-by-tag :paddle)))
+                (let ((wheel (get-mouse-wheel-delta-y)))
+                  (unless (= wheel 0)
+                    (change-paddle-lane paddle (< wheel 0))))
+                (move-paddle-to paddle (get-mouse-x))))))
     (add-ecs-entity controller)))

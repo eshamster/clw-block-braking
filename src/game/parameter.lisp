@@ -12,7 +12,8 @@
            :speed (:init 3)
            :angle (:min (/ PI 7) :max-accele (/ PI 8))
            :dist-from-paddle 5)
-    :paddle (:width 40 :height 6 :depth 8))))
+    :paddle (:width 40 :height 6 :depth 8
+             :base-line-height 56  :lane-space 12 :lane-count 4))))
 
 (defmacro.ps+ get-param (&rest keys)
   `(get-layered-hash *params* ,@keys))
