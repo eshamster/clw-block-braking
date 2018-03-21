@@ -9,7 +9,7 @@
   (convert-to-layered-hash
    (:field (:x 190 :y 20 :width 420 :height 560 :depth 0)
     :ball (:r 5 :color #xffaaaa
-           :speed (:init 3)
+           :speed (:base (:min 3 :max 6))
            :angle (:min (/ PI 7) :max-accele (/ PI 8))
            :dist-from-paddle 5)
     :paddle (:width 40 :height 6 :depth 8

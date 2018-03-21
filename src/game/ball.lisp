@@ -87,6 +87,12 @@
       (move-ball-on-paddle ball)
       (move-ball-normally ball)))
 
+(defun.ps+ calc-base-speed-by-paddle-lane (lane)
+  (add-to-event-log lane)
+  (lerp-scalar (get-param :ball :speed :base :min)
+               (get-param :ball :speed :base :max)
+               (/ lane (- (get-param :paddle :lane-count) 1.0))))
+
 ;; The rect-pnt is left-bottom point of the rect.
 (defun.ps+ calc-col-direction (ball rect-global-pnt rect-width rect-height)
   (check-entity-tags ball :ball)
@@ -187,11 +193,14 @@
                              (set-entity-param entity :col-to-block-p nil)
                              (when (ball-is-above-paddle-p entity paddle)
                                (set-entity-param entity :enable-col-to-paddle-p t))
-                             (move-ball entity)))
+                             (move-ball entity)
+                             (set-entity-param entity :speed
+                                               (calc-base-speed-by-paddle-lane
+                                                (get-entity-param paddle :lane)))))
      (make-physic-circle :target-tags '(:block :paddle)
                          :r r
                          :on-collision #'process-collide)
-     (init-entity-params :speed (get-param :ball :speed :init)
+     (init-entity-params :speed 0
                          :angle (/ PI 3.9)
                          :col-to-block-p nil ; reflect once per frame at most
                          :enable-col-to-paddle-p t
