@@ -34,6 +34,12 @@
     '(:blocks ((:info (:name :super-wide-block :offset-x 0.05 :offset-y 10)
                 :sequences ((:min (0 0) :max (0 0) :step (1 1)))))))
 
+(defun.ps+ get-stage-info (stage-number)
+  (case stage-number
+    (1 *test-stage*)
+    (2 *stage1*)
+    (t nil)))
+
 ;; Note: x and y is relative value to block size
 (defun.ps+ make-block-using-info (name x y field)
   (let ((info (find-if (lambda (info)
@@ -46,8 +52,8 @@
                      (block-info-height info))))
       (make-rect-block (* width x) (* height y) width height))))
 
-(defun.ps+ generate-stage (stage-info field)
-  (dolist (cluster (getf stage-info :blocks))
+(defun.ps+ generate-stage (stage-number field)
+  (dolist (cluster (getf (get-stage-info stage-number) :blocks))
     (let* ((info (getf cluster :info))
            (name (getf info :name))
            (offset-x (getf info :offset-x))

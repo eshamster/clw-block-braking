@@ -5,6 +5,7 @@
         :cl-web-2d-game)
   (:export :make-ball
            :reset-ball
+           :stop-ball
            :add-ball-falling-event
            :shoot-ball)
   (:import-from :clw-block-braking/src/game/parameter
@@ -210,3 +211,7 @@
        (delete-ecs-entity ball)
        (add-ecs-entity (make-ball field paddle)
                        field)))))
+
+;; Note: There is not chance to restart under the current implementation.
+(defun.ps+ stop-ball (ball)
+  (delete-ecs-component-type 'script-2d ball))
