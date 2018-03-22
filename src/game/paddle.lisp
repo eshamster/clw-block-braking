@@ -15,6 +15,37 @@
                 :field-height))
 (in-package :clw-block-braking/src/game/paddle)
 
+(defun.ps+ make-paddle-model (width height)
+  (make-model-2d :model (make-solid-rect :width width :height height :color #xff0000)
+                 :depth (get-param :paddle :depth)
+                 :offset (make-point-2d :x (* -1/2 width) :y (* -1/2 height))))
+
+(defun.ps+ make-paddle-physic (width height)
+  (add-to-event-log (+ width ":" height))
+  (let ((half-width (/ width 2))
+        (half-height (/ height 2)))
+    (make-physic-polygon
+     :target-tags '(:ball)
+     :pnt-list (list (make-point-2d :x (* -1 half-width) :y (* -1 half-height))
+                     (make-point-2d :x       half-width  :y (* -1 half-height))
+                     (make-point-2d :x       half-width  :y       half-height)
+                     (make-point-2d :x (* -1 half-width) :y       half-height)))))
+
+(defun.ps+ change-paddle-width (paddle width)
+  (delete-ecs-component-type 'physic-2d paddle)
+  (delete-ecs-component-type 'model-2d paddle)
+  (let ((height (get-entity-param paddle :height)))
+    (add-ecs-component-list
+     paddle
+     (make-paddle-model width height)
+     (make-paddle-physic width height)))
+  (set-entity-param paddle :width width))
+
+(defun.ps+ calc-paddle-width (lane)
+  (lerp-scalar (get-param :paddle :width :min)
+               (get-param :paddle :width :max)
+               (* 1.0 (/ lane (1- (get-param :paddle :lane-count))))))
+
 (defun.ps+ change-paddle-lane (paddle up-p)
   (check-entity-tags paddle :paddle)
   (let ((lane (get-entity-param paddle :lane))
@@ -28,7 +59,8 @@
           (+ (get-param :paddle :base-line-height)
              (* (get-param :paddle :lane-space)
                 lane)))
-    (set-entity-param paddle :lane lane)))
+    (set-entity-param paddle :lane lane)
+    (change-paddle-width paddle (calc-paddle-width lane))))
 
 (defun.ps+ move-paddle-to (paddle global-x)
   (check-entity-tags paddle :paddle)
@@ -56,25 +88,17 @@
   (let* ((paddle (make-ecs-entity))
          (x (* (field-width field) 0.5))
          (y (get-param :paddle :base-line-height))
-         (width (get-param :paddle :width))
-         (half-width (/ width 2))
-         (height (get-param :paddle :height))
-         (half-height (/ height 2)))
+         (lane 0)
+         (width (calc-paddle-width lane))
+         (height (get-param :paddle :height)))
     (add-entity-tag paddle :paddle)
     (add-ecs-component-list
      paddle
      (make-point-2d :x x :y y)
-     (make-model-2d :model (make-wired-rect :width width :height height :color #xff0000)
-                    :depth (get-param :paddle :depth)
-                    :offset (make-point-2d :x (* -1 half-width) :y (* -1 half-height)))
-     (make-physic-polygon
-      :target-tags '(:ball)
-      :pnt-list (list (make-point-2d :x (* -1 half-width) :y (* -1 half-height))
-                      (make-point-2d :x       half-width  :y (* -1 half-height))
-                      (make-point-2d :x       half-width  :y       half-height)
-                      (make-point-2d :x (* -1 half-width) :y       half-height)))
+     (make-paddle-model width height)
+     (make-paddle-physic width height)
      (init-entity-params :width width
                          :height height
                          :field field
-                         :lane 0))
+                         :lane lane))
     paddle))

@@ -88,7 +88,6 @@
       (move-ball-normally ball)))
 
 (defun.ps+ calc-base-speed-by-paddle-lane (lane)
-  (add-to-event-log lane)
   (lerp-scalar (get-param :ball :speed :base :min)
                (get-param :ball :speed :base :max)
                (/ lane (- (get-param :paddle :lane-count) 1.0))))
