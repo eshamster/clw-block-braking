@@ -3,7 +3,7 @@
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
-  (:export :make-clw-block-braking-menu-state)
+  (:export :make-game-menu-state)
   (:import-from :clw-block-braking/src/game/field
                 :init-field
                 :get-field)
@@ -35,40 +35,40 @@
   (not (find-a-entity-by-tag :block)))
 
 (defstruct.ps+
-    (clw-block-braking-main-state
+    (game-main-state
      (:include game-state
                (start-process
                 (lambda (_this)
                   (let*  ((field (get-field)))
-                    (generate-stage (clw-block-braking-main-state-stage-number _this)
+                    (generate-stage (game-main-state-stage-number _this)
                                     field))
                   (add-life-decrease-event
                    :reset-or-gameover
                    (lambda (rest-life)
                      (if (>= rest-life 0)
                          (reset-ball-on-field)
-                         (setf (clw-block-braking-main-state-gameover-p _this) t))))
+                         (setf (game-main-state-gameover-p _this) t))))
                   t))
                (process
                 (lambda (_this)
                   (add-to-monitoring-log (+ "Life: " (get-rest-life)))
                   (cond ((stage-cleared-p)
-                         (make-clw-block-braking-interval-state
+                         (make-game-interval-state
                           :next-stage-number
-                          (1+ (clw-block-braking-main-state-stage-number _this))))
-                        ((clw-block-braking-main-state-gameover-p _this)
-                         (make-clw-block-braking-gameover-state))
+                          (1+ (game-main-state-stage-number _this))))
+                        ((game-main-state-gameover-p _this)
+                         (make-game-gameover-state))
                         (t nil))))))
     stage-number
     (gameover-p nil))
 
 (defstruct.ps+
-    (clw-block-braking-interval-state
+    (game-interval-state
      (:include game-state
                (start-process
                 (lambda (_this)
                   (stop-ball (get-current-ball))
-                  (let* ((parent (clw-block-braking-interval-state-parent-entity _this))
+                  (let* ((parent (game-interval-state-parent-entity _this))
                          (font-size 25)
                          (margin 20)
                          (area (make-text-area :font-size font-size :text-align :center
@@ -88,19 +88,19 @@
                (process
                 (lambda (_this)
                   (when (eq (get-left-mouse-state) :down-now)
-                    (make-clw-block-braking-main-state
-                     :stage-number (clw-block-braking-interval-state-next-stage-number _this)))))
+                    (make-game-main-state
+                     :stage-number (game-interval-state-next-stage-number _this)))))
                (end-process
                 (lambda (_this)
                   (reset-ball-on-field)
                   (delete-ecs-entity
-                   (clw-block-braking-interval-state-parent-entity _this))
+                   (game-interval-state-parent-entity _this))
                   t))))
     (parent-entity (make-ecs-entity))
     next-stage-number)
 
 (defstruct.ps+
-    (clw-block-braking-init-state
+    (game-init-state
      (:include game-state
                (start-process
                 (lambda (_this)
@@ -117,11 +117,11 @@
                (process
                 (lambda (_this)
                   (declare (ignore _this))
-                  (make-clw-block-braking-main-state
+                  (make-game-main-state
                    :stage-number 1))))))
 
 (defstruct.ps+
-    (clw-block-braking-menu-state
+    (game-menu-state
      (:include game-state
                (start-process
                 (lambda (_this)
@@ -148,14 +148,14 @@
                 (lambda (_this)
                   (declare (ignore _this))
                   (when (eq (get-left-mouse-state) :down-now)
-                    (make-clw-block-braking-init-state))))
+                    (make-game-init-state))))
                (end-process
                 (lambda (_this)
                   (declare (ignore _this))
                   t)))))
 
 (defstruct.ps+
-    (clw-block-braking-gameover-state
+    (game-gameover-state
      (:include game-state
                (start-process
                 (lambda (_this)
@@ -177,7 +177,7 @@
                 (lambda (_this)
                   (declare (ignore _this))
                   (when (eq (get-left-mouse-state) :down-now)
-                    (make-clw-block-braking-menu-state))))
+                    (make-game-menu-state))))
                (end-process
                 (lambda (_this)
                   (with-slots (first-frame) _this
