@@ -8,16 +8,18 @@
                 :make-rect-block))
 (in-package :clw-block-braking/src/game/stage-generator)
 
-(defstruct.ps+ block-info name width height)
+(defstruct.ps+ block-info name width height texture)
 
 ;; Note: width and height is relative value to field size
 (defvar.ps+ *block-list*
     (list (make-block-info :name :block1
                            :width 0.07
-                           :height 0.025)
+                           :height 0.025
+                           :texture "block")
           (make-block-info :name :super-wide-block
                            :width 0.9
-                           :height 0.05)))
+                           :height 0.05
+                           :texture "block")))
 
 ;; Note: x and y is relative value to block size
 (defvar.ps+
@@ -46,11 +48,20 @@
                          (eq (block-info-name info) name))
                        *block-list*)))
     (assert info)
-    (let ((width (* (get-entity-param field :width)
-                    (block-info-width info)))
-          (height (* (get-entity-param field :height)
-                     (block-info-height info))))
-      (make-rect-block (* width x) (* height y) width height))))
+    (let* ((width (* (get-entity-param field :width)
+                     (block-info-width info)))
+           (height (* (get-entity-param field :height)
+                      (block-info-height info)))
+           (result (make-rect-block (* width x) (* height y) width height))) 
+      (frame-promise-then
+       (make-texture-model-promise
+        :width width :height height
+        :texture-name (block-info-texture info))
+       (lambda (model)
+         (add-ecs-component-list
+          result
+          (make-model-2d :model model))))
+      result)))
 
 (defun.ps+ generate-stage (stage-number field)
   (dolist (cluster (getf (get-stage-info stage-number) :blocks))

@@ -128,7 +128,10 @@
                   (declare (ignore _this))
                   ;; TODO: Prevent multiple load
                   (load-font "js/")
-                  (setf-collider-model-enable t)
+                  (load-texture :name "block"
+                                :path "/images/block.png"
+                                :alpha-path "/images/block_alpha.png")
+                  (setf-collider-model-enable nil)
                   (let* ((font-size 25)
                          (margin 20)
                          (area (make-text-area :font-size font-size :text-align :center
