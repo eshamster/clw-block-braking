@@ -23,7 +23,6 @@
 (defun.ps+ add-ball-falling-event (name func)
   (setf (gethash name *ball-falling-event*) func))
 
-;; TODO: correct not to sink into
 (defun.ps+ reflect-by-vertical (ball)
   (check-entity-tags ball :ball)
   (set-entity-param ball :angle
@@ -160,17 +159,42 @@
        (reflect-by-horizontal ball)))
     (adjust-angle-by-paddle ball paddle)))
 
+;; To avoid to sink into target
+(defun.ps+ adjust-ball-pnt-after-reflection (ball target pre-point)
+  (check-entity-tags ball :ball)
+  (let* ((point (get-ecs-component 'point-2d ball))
+         (not-adjusted-point (clone-point-2d point))
+         (min-point (clone-point-2d pre-point))
+         (max-point (clone-point-2d point))
+         (repeat-times 6))
+    ;; Reverse ball to reflection point
+    (lerp-vector-2d min-point max-point 0.5
+                    point)
+    (dotimes (i repeat-times)
+      (if (collide-entities-p ball target)
+          (copy-point-2d-to max-point point)
+          (copy-point-2d-to min-point point))
+      (lerp-vector-2d min-point max-point 0.5
+                      point))
+    ;; Advance position of the ball to direction after reflection
+    (let ((angle (get-entity-param ball :angle))
+          (dist (calc-dist-p2 point not-adjusted-point)))
+      (incf (point-2d-x point) (* dist (cos angle)))
+      (incf (point-2d-y point) (* dist (sin angle))))))
+
 (defun.ps+ process-collide (ball target)
   (check-entity-tags ball :ball)
-  (cond ((has-entity-tag target :block)
-         (unless (get-entity-param ball :col-to-block-p)
-           (reflect-to-block ball target)
-           (set-entity-param ball :col-to-block-p t)))
-        ((has-entity-tag target :paddle)
-         (when (get-entity-param ball :enable-col-to-paddle-p)
-           (reflect-to-paddle ball target)
-           (set-entity-param ball :enable-col-to-paddle-p nil)))
-        (t (error "Collides to unknown object."))))
+  (let ((pre-point (clone-point-2d (get-ecs-component 'point-2d ball))))
+    (cond ((has-entity-tag target :block)
+           (unless (get-entity-param ball :col-to-block-p)
+             (reflect-to-block ball target)
+             (set-entity-param ball :col-to-block-p t)))
+          ((has-entity-tag target :paddle)
+           (when (get-entity-param ball :enable-col-to-paddle-p)
+             (reflect-to-paddle ball target)
+             (set-entity-param ball :enable-col-to-paddle-p nil)))
+          (t (error "Collides to unknown object.")))
+    (adjust-ball-pnt-after-reflection ball target pre-point)))
 
 (defun.ps+ ball-is-above-paddle-p (ball paddle)
   (> (- (vector-2d-y (calc-global-point ball))
