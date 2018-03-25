@@ -201,7 +201,6 @@
     (add-ecs-component-list
      ball
      (make-point-2d :x (/ width 2) :y 50)
-     (make-model-2d :model (make-solid-circle :r r :color (get-param :ball :color)))
      (make-script-2d :func (lambda (entity)
                              (set-entity-param entity :col-to-block-p nil)
                              (when (ball-is-above-paddle-p entity paddle)
@@ -222,6 +221,16 @@
                          :field field
                          :fallen-p nil
                          :r r))
+    (frame-promise-then
+     (make-texture-model-promise
+      :width (* 2 r) :height (* 2 r)
+      :texture-name "ball")
+     (lambda (model)
+       (add-ecs-component-list
+        ball
+        (make-model-2d :model model
+                       :offset (make-point-2d :x (* -1 r) :y (* -1 r))
+                       :depth (get-param :ball :depth)))))
     ball))
 
 (defun.ps+ reset-ball (ball)

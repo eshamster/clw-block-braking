@@ -29,7 +29,7 @@
 (defvar.ps+ *params*
   (convert-to-layered-hash
    (:field (:x 190 :y 20 :width field-width :height field-height :depth 0)
-    :ball (:r #lx10 :color #xffaaaa
+    :ball (:r #lx10 :color #xffaaaa :depth 10
            :speed (:base (:min #ly5 :max #ly10))
            :angle (:min (/ PI 7) :max-accele (/ PI 8))
            :dist-from-paddle #ly10)
