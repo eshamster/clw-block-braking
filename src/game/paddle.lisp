@@ -21,7 +21,6 @@
                  :offset (make-point-2d :x (* -1/2 width) :y (* -1/2 height))))
 
 (defun.ps+ make-paddle-physic (width height)
-  (add-to-event-log (+ width ":" height))
   (let ((half-width (/ width 2))
         (half-height (/ height 2)))
     (make-physic-polygon
