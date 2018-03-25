@@ -17,7 +17,6 @@
                 :init-controller)
   (:import-from :clw-block-braking/src/game/life
                 :add-life-decrease-event
-                :get-rest-life
                 :init-life)
   (:import-from :clw-block-braking/src/game/paddle
                 :make-paddle)
@@ -53,7 +52,6 @@
                   t))
                (process
                 (lambda (_this)
-                  (add-to-monitoring-log (+ "Life: " (get-rest-life)))
                   (cond ((stage-cleared-p)
                          (make-game-interval-state
                           :next-stage-number
@@ -109,13 +107,13 @@
                   (declare (ignore _this))
                   (init-field)
                   (init-controller)
-                  (init-life)
                   (let*  ((field (get-field))
                           (paddle (make-paddle field))
                           (ball (make-ball field paddle)))
                     (add-ecs-entity-to-buffer paddle field)
                     (add-ecs-entity-to-buffer ball field)
-                    (init-wall field))
+                    (init-wall field)
+                    (init-life field))
                   t))
                (process
                 (lambda (_this)
