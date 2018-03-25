@@ -20,7 +20,9 @@
                 :get-rest-life
                 :init-life)
   (:import-from :clw-block-braking/src/game/paddle
-                :make-paddle))
+                :make-paddle)
+  (:import-from :clw-block-braking/src/game/wall
+                :init-wall))
 (in-package :clw-block-braking/src/game/clw-block-braking-state)
 
 (defun.ps+ get-current-ball ()
@@ -112,7 +114,8 @@
                           (paddle (make-paddle field))
                           (ball (make-ball field paddle)))
                     (add-ecs-entity-to-buffer paddle field)
-                    (add-ecs-entity-to-buffer ball field))
+                    (add-ecs-entity-to-buffer ball field)
+                    (init-wall field))
                   t))
                (process
                 (lambda (_this)

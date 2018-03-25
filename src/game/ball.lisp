@@ -35,23 +35,13 @@
 
 (defun.ps+ move-ball-normally (ball)
   (check-entity-tags ball :ball)
-  (let* ((field (get-field))
-         (width (field-width field))
-         (height (field-height field))
-         (speed (get-entity-param ball :speed))
+  (let* ((speed (get-entity-param ball :speed))
          (angle (get-entity-param ball :angle))
          (r (get-entity-param ball :r)))
     (with-ecs-components ((point point-2d)) ball
       (with-slots (x y) point
         (incf x (* speed (cos angle)))
         (incf y (* speed (sin angle)))
-        ;; reflect
-        (when (> (+ x r) width)
-          (reflect-by-vertical ball))
-        (when (< (- x r) 0)
-          (reflect-by-vertical ball))
-        (when (> (+ y r) height)
-          (reflect-by-horizontal ball))
         ;; fall
         (when (and (< (+ y r) 0)
                    (not (get-entity-param ball :fallen-p)))
@@ -117,7 +107,6 @@
 
 (defun.ps+ reflect-to-block (ball block)
   (check-entity-tags ball :ball)
-  (check-entity-tags block :block)
   (let ((block-pnt (calc-global-point block))
         (block-width (get-entity-param block :width))
         (block-height (get-entity-param block :height)))
@@ -185,7 +174,8 @@
 (defun.ps+ process-collide (ball target)
   (check-entity-tags ball :ball)
   (let ((pre-point (clone-point-2d (get-ecs-component 'point-2d ball))))
-    (cond ((has-entity-tag target :block)
+    (cond ((or (has-entity-tag target :block)
+               (has-entity-tag target :wall))
            (unless (get-entity-param ball :col-to-block-p)
              (reflect-to-block ball target)
              (set-entity-param ball :col-to-block-p t)))
@@ -220,7 +210,7 @@
                              (set-entity-param entity :speed
                                                (calc-base-speed-by-paddle-lane
                                                 (get-entity-param paddle :lane)))))
-     (make-physic-circle :target-tags '(:block :paddle)
+     (make-physic-circle :target-tags '(:block :paddle :wall)
                          :r r
                          :on-collision #'process-collide)
      (init-entity-params :speed 0
