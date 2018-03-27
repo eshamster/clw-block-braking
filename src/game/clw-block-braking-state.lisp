@@ -20,6 +20,11 @@
                 :init-life)
   (:import-from :clw-block-braking/src/game/paddle
                 :make-paddle)
+  (:import-from :clw-block-braking/src/game/timer
+                :init-timer
+                :start-timer
+                :stop-timer
+                :reset-timer)
   (:import-from :clw-block-braking/src/game/wall
                 :init-wall))
 (in-package :clw-block-braking/src/game/clw-block-braking-state)
@@ -49,6 +54,7 @@
                      (if (>= rest-life 0)
                          (reset-ball-on-field)
                          (setf (game-main-state-gameover-p _this) t))))
+                  (start-timer)
                   t))
                (process
                 (lambda (_this)
@@ -58,7 +64,12 @@
                           (1+ (game-main-state-stage-number _this))))
                         ((game-main-state-gameover-p _this)
                          (make-game-gameover-state))
-                        (t nil))))))
+                        (t nil))))
+               (end-process
+                (lambda (_this)
+                  (declare (ignore _this))
+                  (stop-timer)
+                  t))))
     stage-number
     (gameover-p nil))
 
@@ -92,6 +103,7 @@
                      :stage-number (game-interval-state-next-stage-number _this)))))
                (end-process
                 (lambda (_this)
+                  (reset-timer)
                   (reset-ball-on-field)
                   (delete-ecs-entity
                    (game-interval-state-parent-entity _this))
@@ -114,6 +126,7 @@
                     (add-ecs-entity-to-buffer ball field)
                     (init-wall field)
                     (init-life field))
+                  (init-timer)
                   t))
                (process
                 (lambda (_this)
