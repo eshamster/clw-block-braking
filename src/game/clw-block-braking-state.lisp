@@ -12,7 +12,8 @@
                 :reset-ball
                 :stop-ball)
   (:import-from :clw-block-braking/src/game/stage-generator
-                :generate-stage)
+                :generate-stage
+                :get-max-stage-number)
   (:import-from :clw-block-braking/src/game/controller
                 :init-controller)
   (:import-from :clw-block-braking/src/game/life
@@ -59,9 +60,8 @@
                (process
                 (lambda (_this)
                   (cond ((stage-cleared-p)
-                         (make-game-interval-state
-                          :next-stage-number
-                          (1+ (game-main-state-stage-number _this))))
+                         (make-game-stage-clear-state
+                          :cleared-stage-number (game-main-state-stage-number _this)))
                         ((game-main-state-gameover-p _this)
                          (make-game-gameover-state))
                         (t nil))))
@@ -74,11 +74,28 @@
     (gameover-p nil))
 
 (defstruct.ps+
+    (game-stage-clear-state
+     (:include game-state
+               (start-process
+                (lambda (_this)
+                  (declare (ignore _this))
+                  (stop-ball (get-current-ball))
+                  t))
+               (process
+                (lambda (_this)
+                  (let ((next-stage
+                         (1+ (game-stage-clear-state-cleared-stage-number _this))))
+                    (add-to-event-log next-stage)
+                    (if (<= next-stage (get-max-stage-number))
+                        (make-game-interval-state :next-stage-number next-stage)
+                        (make-game-all-clear-state)))))))
+    cleared-stage-number)
+
+(defstruct.ps+
     (game-interval-state
      (:include game-state
                (start-process
                 (lambda (_this)
-                  (stop-ball (get-current-ball))
                   (let* ((parent (game-interval-state-parent-entity _this))
                          (font-size 25)
                          (margin 20)
@@ -110,6 +127,47 @@
                   t))))
     (parent-entity (make-ecs-entity))
     next-stage-number)
+
+(defun.ps+ delete-all-entities-in-next-frame ()
+  (do-ecs-entities entity
+    (unless (ecs-entity-parent entity)
+      (register-next-frame-func
+       (lambda () (delete-ecs-entity entity))))))
+
+(defstruct.ps+
+    (game-all-clear-state
+     (:include game-state
+               (start-process
+                (lambda (_this)
+                  (let* ((font-size 25)
+                         (margin 20)
+                         (area (make-text-area :font-size font-size :text-align :center
+                                               :margin margin
+                                               :x (/ (get-screen-width) 2)
+                                               :y (+ (/ (get-screen-height) 2)
+                                                     (+ (* font-size 2) margin)))))
+                    (add-text-to-area area
+                                      :text "ALL STAGE CLEAR!!"
+                                      :color #x00ffff)
+                    (add-text-to-area area
+                                      :text "Click for returning to menu"
+                                      :color #x00ffff)
+                    (add-ecs-entity area))
+                  t))
+               (process
+                (lambda (_this)
+                  (declare (ignore _this))
+                  (when (eq (get-left-mouse-state) :down-now)
+                    (make-game-menu-state))))
+               (end-process
+                (lambda (_this)
+                  (with-slots (first-frame) _this
+                    (if first-frame
+                        (progn (delete-all-entities-in-next-frame)
+                               (setf first-frame nil)
+                               nil)
+                        t))))))
+    (first-frame t))
 
 (defstruct.ps+
     (game-init-state
@@ -199,10 +257,7 @@
                 (lambda (_this)
                   (with-slots (first-frame) _this
                     (if first-frame
-                        (progn (do-ecs-entities entity
-                                 (unless (ecs-entity-parent entity)
-                                   (register-next-frame-func
-                                    (lambda () (delete-ecs-entity entity)))))
+                        (progn (delete-all-entities-in-next-frame)
                                (setf first-frame nil)
                                nil)
                         t))))))

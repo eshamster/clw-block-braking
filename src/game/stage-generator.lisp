@@ -3,7 +3,8 @@
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
-  (:export :generate-stage)
+  (:export :generate-stage
+           :get-max-stage-number)
   (:import-from :clw-block-braking/src/game/block
                 :make-rect-block))
 (in-package :clw-block-braking/src/game/stage-generator)
@@ -35,6 +36,13 @@
     *test-stage*
     '(:blocks ((:info (:name :super-wide-block :offset-x 0.05 :offset-y 10)
                 :sequences ((:min (0 0) :max (0 0) :step (1 1)))))))
+
+(defun.ps+ get-max-stage-number ()
+  (labels ((rec (stage-number)
+             (if (get-stage-info stage-number)
+                 (rec (1+ stage-number))
+                 (1- stage-number))))
+    (rec 1)))
 
 (defun.ps+ get-stage-info (stage-number)
   (case stage-number
