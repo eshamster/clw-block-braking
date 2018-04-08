@@ -206,6 +206,9 @@
                   (load-texture :name "ball"
                                 :path "/images/ball.png"
                                 :alpha-path "/images/ball_alpha.png")
+                  (load-texture :name "block-braking"
+                                :path "/images/block_braking.png"
+                                :alpha-path "/images/block_braking_alpha.png")
                   (setf-collider-model-enable nil)
                   (let* ((font-size 25)
                          (margin 20)
