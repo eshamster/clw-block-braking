@@ -168,7 +168,6 @@
     ;; Advance position of the ball to direction after reflection
     (let ((angle (get-entity-param ball :angle))
           (dist (calc-dist point not-adjusted-point)))
-      (add-to-event-log (+ "after: " dist))
       (incf (point-2d-x point) (* dist (cos angle)))
       (incf (point-2d-y point) (* dist (sin angle))))))
 
