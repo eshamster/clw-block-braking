@@ -15,6 +15,18 @@
                 :field-height))
 (in-package :clw-block-braking/src/game/paddle)
 
+;; --- paddle marker --- ;;
+
+(defvar.ps+ *paddle-marker-scale* 3)
+
+(defun.ps+ calc-paddle-marker-offset (paddle)
+  (let ((width (get-entity-param paddle :width))
+        (height (get-entity-param paddle :height))
+        (scale *paddle-marker-scale*))
+    (make-point-2d :x (+ (/ (+ width height) 2)
+                         (* (/ scale -2) height))
+                   :y (* (/ scale -2) height))))
+
 (defun.ps+ update-paddle-marker-by-lane (paddle)
   (check-entity-tags paddle :paddle)
   (let ((lane (get-entity-param paddle :lane))
@@ -24,6 +36,8 @@
     (when (and up-model down-model)
       (disable-model-2d paddle :target-model-2d up-model)
       (disable-model-2d paddle :target-model-2d down-model)
+      (setf (model-2d-offset up-model) (calc-paddle-marker-offset paddle))
+      (setf (model-2d-offset down-model) (calc-paddle-marker-offset paddle))
       (when (> lane 0)
         (enable-model-2d paddle :target-model-2d up-model))
       (when (< lane (1- lane-count))
@@ -33,7 +47,7 @@
   (check-entity-tags paddle :paddle)
   (let ((width (get-entity-param paddle :width))
         (height (get-entity-param paddle :height))
-        (scale 3))
+        (scale *paddle-marker-scale*))
     (frame-promise-all
      (mapcar (lambda (texture-name)
                (make-texture-model-promise
@@ -42,14 +56,11 @@
              '("paddle-marker-up" "paddle-marker-down"))
      (lambda (values)
        (assert (= (length values) 2))
-       (let* ((x (+ (/ (+ width height) 2)
-                    (* (/ scale -2) height)))
-              (y (* (/ scale -2) height))
-              (model-2d-list
+       (let* ((model-2d-list
                (mapcar (lambda (model)
                          (make-model-2d :model model
                                         :depth (1+ (get-param :paddle :depth))
-                                        :offset (make-point-2d :x x :y y)))
+                                        :offset (calc-paddle-marker-offset paddle)))
                        values))
               (up-model-2d (nth 0 model-2d-list))
               (down-model-2d (nth 1 model-2d-list)))
@@ -60,6 +71,8 @@
          (set-entity-param paddle :up-model up-model-2d)
          (set-entity-param paddle :down-model down-model-2d)
          (update-paddle-marker-by-lane paddle))))))
+
+;; --- basic --- ;;
 
 (defun.ps+ make-paddle-model (width height)
   (make-model-2d :model (make-solid-rect :width width :height height :color #xff0000)
