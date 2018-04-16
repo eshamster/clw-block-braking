@@ -15,6 +15,52 @@
                 :field-height))
 (in-package :clw-block-braking/src/game/paddle)
 
+(defun.ps+ update-paddle-marker-by-lane (paddle)
+  (check-entity-tags paddle :paddle)
+  (let ((lane (get-entity-param paddle :lane))
+        (lane-count (get-param :paddle :lane-count))
+        (up-model (get-entity-param paddle :up-model))
+        (down-model (get-entity-param paddle :down-model)))
+    (when (and up-model down-model)
+      (disable-model-2d paddle :target-model-2d up-model)
+      (disable-model-2d paddle :target-model-2d down-model)
+      (when (> lane 0)
+        (enable-model-2d paddle :target-model-2d up-model))
+      (when (< lane (1- lane-count))
+        (enable-model-2d paddle :target-model-2d down-model)))))
+
+(defun.ps+ append-paddle-marker (paddle)
+  (check-entity-tags paddle :paddle)
+  (let ((width (get-entity-param paddle :width))
+        (height (get-entity-param paddle :height))
+        (scale 3))
+    (frame-promise-all
+     (mapcar (lambda (texture-name)
+               (make-texture-model-promise
+                :width (* height scale) :height (* height scale)
+                :texture-name texture-name))
+             '("paddle-marker-up" "paddle-marker-down"))
+     (lambda (values)
+       (assert (= (length values) 2))
+       (let* ((x (+ (/ (+ width height) 2)
+                    (* (/ scale -2) height)))
+              (y (* (/ scale -2) height))
+              (model-2d-list
+               (mapcar (lambda (model)
+                         (make-model-2d :model model
+                                        :depth (1+ (get-param :paddle :depth))
+                                        :offset (make-point-2d :x x :y y)))
+                       values))
+              (up-model-2d (nth 0 model-2d-list))
+              (down-model-2d (nth 1 model-2d-list)))
+         (add-ecs-component-list
+          paddle
+          up-model-2d
+          down-model-2d)
+         (set-entity-param paddle :up-model up-model-2d)
+         (set-entity-param paddle :down-model down-model-2d)
+         (update-paddle-marker-by-lane paddle))))))
+
 (defun.ps+ make-paddle-model (width height)
   (make-model-2d :model (make-solid-rect :width width :height height :color #xff0000)
                  :depth (get-param :paddle :depth)
@@ -30,14 +76,17 @@
                      (make-point-2d :x       half-width  :y       half-height)
                      (make-point-2d :x (* -1 half-width) :y       half-height)))))
 
+;; Note: Maybe deleting current and creating new is better
 (defun.ps+ change-paddle-width (paddle width)
   (delete-ecs-component-type 'physic-2d paddle)
-  (delete-ecs-component-type 'model-2d paddle)
-  (let ((height (get-entity-param paddle :height)))
+  (delete-ecs-component (get-entity-param paddle :model) paddle)
+  (let* ((height (get-entity-param paddle :height))
+         (new-model (make-paddle-model width height)))
     (add-ecs-component-list
      paddle
-     (make-paddle-model width height)
-     (make-paddle-physic width height)))
+     new-model
+     (make-paddle-physic width height))
+    (set-entity-param paddle :model new-model))
   (set-entity-param paddle :width width))
 
 (defun.ps+ calc-paddle-width (lane)
@@ -59,7 +108,8 @@
              (* (get-param :paddle :lane-space)
                 lane)))
     (set-entity-param paddle :lane lane)
-    (change-paddle-width paddle (calc-paddle-width lane))))
+    (change-paddle-width paddle (calc-paddle-width lane))
+    (update-paddle-marker-by-lane paddle)))
 
 (defun.ps+ move-paddle-to (paddle global-x)
   (check-entity-tags paddle :paddle)
@@ -89,15 +139,18 @@
          (y (get-param :paddle :base-line-height))
          (lane 0)
          (width (calc-paddle-width lane))
-         (height (get-param :paddle :height)))
+         (height (get-param :paddle :height))
+         (model (make-paddle-model width height)))
     (add-entity-tag paddle :paddle)
     (add-ecs-component-list
      paddle
      (make-point-2d :x x :y y)
-     (make-paddle-model width height)
+     model
      (make-paddle-physic width height)
      (init-entity-params :width width
                          :height height
                          :field field
-                         :lane lane))
+                         :lane lane
+                         :model model))
+    (append-paddle-marker paddle)
     paddle))

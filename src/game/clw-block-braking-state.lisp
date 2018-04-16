@@ -209,6 +209,14 @@
                   (load-texture :name "block-braking"
                                 :path "/images/block_braking.png"
                                 :alpha-path "/images/block_braking_alpha.png")
+                  (load-texture :name "paddle-marker-up"
+                                :path "/images/paddle_marker.png"
+                                :alpha-path "/images/paddle_marker_alpha.png"
+                                :height 0.5)
+                  (load-texture :name "paddle-marker-down"
+                                :path "/images/paddle_marker.png"
+                                :alpha-path "/images/paddle_marker_alpha.png"
+                                :y 0.5 :height 0.5)
                   (setf-collider-model-enable nil)
                   (let* ((font-size 25)
                          (margin 20)
