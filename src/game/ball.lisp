@@ -15,7 +15,8 @@
                 :field-width
                 :field-height)
   (:import-from :clw-block-braking/src/game/paddle
-                :get-paddle-global-pnt))
+                :get-paddle-global-pnt
+                :add-paddle-move-event))
 (in-package :clw-block-braking/src/game/ball)
 
 (defvar.ps+ *ball-falling-event* (make-hash-table))
@@ -72,9 +73,8 @@
 
 (defun.ps+ move-ball (ball)
   (check-entity-tags ball :ball)
-  (if (get-entity-param ball :on-paddle-p)
-      (move-ball-on-paddle ball)
-      (move-ball-normally ball)))
+  (unless (get-entity-param ball :on-paddle-p)
+    (move-ball-normally ball)))
 
 (defun.ps+ calc-base-speed-by-paddle-lane (lane)
   (lerp-scalar (get-param :ball :speed :base :min)
@@ -232,6 +232,12 @@
         (make-model-2d :model model
                        :offset (make-point-2d :x (* -1 r) :y (* -1 r))
                        :depth (get-param :ball :depth)))))
+    (add-paddle-move-event paddle
+                           :move-on-paddle
+                           (lambda (_)
+                             (declare (ignore _))
+                             (when (get-entity-param ball :on-paddle-p)
+                               (move-ball-on-paddle ball))))
     ball))
 
 (defun.ps+ reset-ball (ball)

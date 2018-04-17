@@ -7,13 +7,26 @@
            :make-paddle
            :get-paddle-global-pnt
            :move-paddle-to
-           :change-paddle-lane)
+           :change-paddle-lane
+           :add-paddle-move-event)
   (:import-from :clw-block-braking/src/game/parameter
                 :get-param)
   (:import-from :clw-block-braking/src/game/field
                 :field-width
                 :field-height))
 (in-package :clw-block-braking/src/game/paddle)
+
+;; --- event --- ;;
+
+(defun.ps+ add-paddle-move-event (paddle name func)
+  (setf (gethash name (get-entity-param paddle :move-event))
+        func))
+
+(defun.ps+ call-paddle-move-event (paddle)
+  (maphash (lambda (name func)
+             (declare (ignore name))
+             (funcall func paddle))
+           (get-entity-param paddle :move-event)))
 
 ;; --- paddle marker --- ;;
 
@@ -122,7 +135,8 @@
                 lane)))
     (set-entity-param paddle :lane lane)
     (change-paddle-width paddle (calc-paddle-width lane))
-    (update-paddle-marker-by-lane paddle)))
+    (update-paddle-marker-by-lane paddle)
+    (call-paddle-move-event paddle)))
 
 (defun.ps+ move-paddle-to (paddle global-x)
   (check-entity-tags paddle :paddle)
@@ -137,7 +151,8 @@
       (setf (point-2d-x point)
             (cond ((> (+ center-x half-width) field-width) (- field-width half-width))
                   ((< (- center-x half-width) 0) half-width)
-                  (t center-x))))))
+                  (t center-x)))))
+  (call-paddle-move-event paddle))
 
 (defun.ps+ get-paddle-global-pnt (paddle)
   (check-entity-tags paddle :paddle)
@@ -164,6 +179,7 @@
                          :height height
                          :field field
                          :lane lane
-                         :model model))
+                         :model model
+                         :move-event (make-hash-table)))
     (append-paddle-marker paddle)
     paddle))
