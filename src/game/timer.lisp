@@ -6,7 +6,8 @@
   (:export :init-timer
            :start-timer
            :stop-timer
-           :reset-timer))
+           :reset-timer
+           :get-current-sec))
 (in-package :clw-block-braking/src/game/timer)
 
 (defun.ps+ find-timer ()
@@ -24,6 +25,12 @@
   (check-entity-tags timer :timer)
   (stop-timer timer)
   (set-entity-param timer :frame-count 0))
+
+(defun.ps+ get-current-sec (&optional (timer (find-timer)))
+  (let ((scale 10))
+    (/ (floor (/ (* (get-entity-param timer :frame-count) scale)
+                                   60))
+                         scale)))
 
 (defun.ps+ init-timer ()
   (let ((timer (make-ecs-entity)))

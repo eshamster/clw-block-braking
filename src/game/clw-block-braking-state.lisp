@@ -6,7 +6,8 @@
   (:export :make-game-menu-state)
   (:import-from :clw-block-braking/src/game/field
                 :init-field
-                :get-field)
+                :get-field
+                :field-height)
   (:import-from :clw-block-braking/src/game/ball
                 :make-ball
                 :reset-ball
@@ -21,11 +22,17 @@
                 :init-life)
   (:import-from :clw-block-braking/src/game/paddle
                 :make-paddle)
+  (:import-from :clw-block-braking/src/game/score-register
+                :init-score-register
+                :register-score
+                :get-score
+                :score-time)
   (:import-from :clw-block-braking/src/game/timer
                 :init-timer
                 :start-timer
                 :stop-timer
-                :reset-timer)
+                :reset-timer
+                :get-current-sec)
   (:import-from :clw-block-braking/src/game/wall
                 :init-wall))
 (in-package :clw-block-braking/src/game/clw-block-braking-state)
@@ -67,7 +74,6 @@
                         (t nil))))
                (end-process
                 (lambda (_this)
-                  (declare (ignore _this))
                   (stop-timer)
                   t))))
     stage-number
@@ -78,8 +84,9 @@
      (:include game-state
                (start-process
                 (lambda (_this)
-                  (declare (ignore _this))
                   (stop-ball (get-current-ball))
+                  (register-score :stage (game-stage-clear-state-cleared-stage-number _this)
+                                  :time (get-current-sec))
                   t))
                (process
                 (lambda (_this)
@@ -139,20 +146,37 @@
      (:include game-state
                (start-process
                 (lambda (_this)
-                  (let* ((font-size 25)
-                         (margin 20)
-                         (area (make-text-area :font-size font-size :text-align :center
-                                               :margin margin
-                                               :x (/ (get-screen-width) 2)
-                                               :y (+ (/ (get-screen-height) 2)
-                                                     (+ (* font-size 2) margin)))))
-                    (add-text-to-area area
-                                      :text "ALL STAGE CLEAR!!"
-                                      :color #x00ffff)
-                    (add-text-to-area area
-                                      :text "Click for returning to menu"
-                                      :color #x00ffff)
-                    (add-ecs-entity area))
+                  (declare (ignore _this))
+                  (let ((field (get-field)))
+                    (let* ((font-size 25)
+                           (margin 20)
+                           (area (make-text-area :font-size font-size :text-align :left
+                                                 :margin margin
+                                                 :x font-size
+                                                 :y (- (field-height field) font-size))))
+                      (add-text-to-area area
+                                        :text "ALL STAGE CLEAR!!"
+                                        :color #xff0088)
+                      (dolist (text '("Click for" "returning to menu"))
+                        (add-text-to-area area
+                                          :text text
+                                          :color #x00ffff))
+                      (add-ecs-entity area field))
+                    (let* ((font-size 15)
+                           (margin 10)
+                           (stage-count (get-max-stage-number))
+                           (area (make-text-area :font-size font-size :text-align :left
+                                                 :margin margin
+                                                 :x font-size
+                                                 :y (* (+ stage-count 5) (+ font-size margin)))))
+                      (dotimes (i stage-count)
+                        (let ((stage (1+ i)))
+                          (add-text-to-area area
+                                            ;; XXX: This is invalid as CL code
+                                            :text (+ "Stage" stage ": "
+                                                     (score-time (get-score stage)))
+                                            :color #xff8800)))
+                      (add-ecs-entity area field)))
                   t))
                (process
                 (lambda (_this)
@@ -185,6 +209,7 @@
                     (init-wall field)
                     (init-life field))
                   (init-timer)
+                  (init-score-register)
                   t))
                (process
                 (lambda (_this)
