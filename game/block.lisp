@@ -1,13 +1,13 @@
-(defpackage clw-block-braking/src/game/block
+(defpackage clw-block-braking/game/block
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :make-rect-block)
-  (:import-from :clw-block-braking/src/game/field
+  (:import-from :clw-block-braking/game/field
                 :field-width
                 :field-height))
-(in-package :clw-block-braking/src/game/block)
+(in-package :clw-block-braking/game/block)
 
 (defun.ps+ add-block-braking-animation (blk)
   (frame-promise-then
@@ -37,7 +37,7 @@
         model-2d
         anime-2d)
        (start-animation anime-2d)
-       (add-ecs-entity-to-buffer entity (clw-block-braking/src/game/field:get-field))))))
+       (add-ecs-entity-to-buffer entity (clw-block-braking/game/field:get-field))))))
 
 (defun.ps+ make-rect-block (x y width height)
   (let ((blk (make-ecs-entity)))

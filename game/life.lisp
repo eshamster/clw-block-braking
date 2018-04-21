@@ -1,4 +1,4 @@
-(defpackage clw-block-braking/src/game/life
+(defpackage clw-block-braking/game/life
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
@@ -6,11 +6,11 @@
   (:export :init-life
            :get-rest-life
            :add-life-decrease-event)
-  (:import-from :clw-block-braking/src/game/ball
+  (:import-from :clw-block-braking/game/ball
                 :add-ball-falling-event)
-  (:import-from :clw-block-braking/src/game/parameter
+  (:import-from :clw-block-braking/game/parameter
                 :get-param))
-(in-package :clw-block-braking/src/game/life)
+(in-package :clw-block-braking/game/life)
 
 ;; --- event --- ;;
 

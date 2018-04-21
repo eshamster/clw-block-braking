@@ -27,7 +27,7 @@
                :ningle
                :cl-markup
                :clack
-               :clw-block-braking/src/clw-block-braking)
+               :clw-block-braking/main)
   :description "A sample block braking written by Common Lisp as Web application"
   :long-description
   #.(with-open-file (stream (merge-pathnames

@@ -1,13 +1,13 @@
-(defpackage clw-block-braking/src/game/stage-generator
+(defpackage clw-block-braking/game/stage-generator
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :generate-stage
            :get-max-stage-number)
-  (:import-from :clw-block-braking/src/game/block
+  (:import-from :clw-block-braking/game/block
                 :make-rect-block))
-(in-package :clw-block-braking/src/game/stage-generator)
+(in-package :clw-block-braking/game/stage-generator)
 
 (defstruct.ps+ block-info name width height texture)
 

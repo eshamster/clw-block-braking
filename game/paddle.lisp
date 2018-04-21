@@ -1,4 +1,4 @@
-(defpackage clw-block-braking/src/game/paddle
+(defpackage clw-block-braking/game/paddle
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
@@ -9,12 +9,12 @@
            :move-paddle-to
            :change-paddle-lane
            :add-paddle-move-event)
-  (:import-from :clw-block-braking/src/game/parameter
+  (:import-from :clw-block-braking/game/parameter
                 :get-param)
-  (:import-from :clw-block-braking/src/game/field
+  (:import-from :clw-block-braking/game/field
                 :field-width
                 :field-height))
-(in-package :clw-block-braking/src/game/paddle)
+(in-package :clw-block-braking/game/paddle)
 
 ;; --- event --- ;;
 

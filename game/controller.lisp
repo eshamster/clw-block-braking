@@ -1,15 +1,15 @@
-(defpackage clw-block-braking/src/game/controller
+(defpackage clw-block-braking/game/controller
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :init-controller)
-  (:import-from :clw-block-braking/src/game/ball
+  (:import-from :clw-block-braking/game/ball
                 :shoot-ball)
-  (:import-from :clw-block-braking/src/game/paddle
+  (:import-from :clw-block-braking/game/paddle
                 :move-paddle-to
                 :change-paddle-lane))
-(in-package :clw-block-braking/src/game/controller)
+(in-package :clw-block-braking/game/controller)
 
 (defun.ps+ init-controller ()
   (let ((controller (make-ecs-entity)))

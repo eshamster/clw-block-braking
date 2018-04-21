@@ -1,13 +1,13 @@
-(defpackage clw-block-braking/src/game/wall
+(defpackage clw-block-braking/game/wall
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :init-wall)
-  (:import-from :clw-block-braking/src/game/field
+  (:import-from :clw-block-braking/game/field
                 :field-width
                 :field-height))
-(in-package :clw-block-braking/src/game/wall)
+(in-package :clw-block-braking/game/wall)
 
 (defun.ps+ init-wall (field)
   (let ((large-len (* 2 (field-height field)))

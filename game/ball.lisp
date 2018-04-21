@@ -1,4 +1,4 @@
-(defpackage clw-block-braking/src/game/ball
+(defpackage clw-block-braking/game/ball
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
@@ -8,16 +8,16 @@
            :stop-ball
            :add-ball-falling-event
            :shoot-ball)
-  (:import-from :clw-block-braking/src/game/parameter
+  (:import-from :clw-block-braking/game/parameter
                 :get-param)
-  (:import-from :clw-block-braking/src/game/field
+  (:import-from :clw-block-braking/game/field
                 :get-field
                 :field-width
                 :field-height)
-  (:import-from :clw-block-braking/src/game/paddle
+  (:import-from :clw-block-braking/game/paddle
                 :get-paddle-global-pnt
                 :add-paddle-move-event))
-(in-package :clw-block-braking/src/game/ball)
+(in-package :clw-block-braking/game/ball)
 
 (defvar.ps+ *ball-falling-event* (make-hash-table))
 

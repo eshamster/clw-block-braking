@@ -1,9 +1,9 @@
-(defpackage clw-block-braking/src/game/parameter
+(defpackage clw-block-braking/game/parameter
   (:use :cl
         :ps-experiment
         :cl-web-2d-game)
   (:export :get-param))
-(in-package :clw-block-braking/src/game/parameter)
+(in-package :clw-block-braking/game/parameter)
 
 (eval-when (:execute :compile-toplevel :load-toplevel)
   ;; width : height = 3 : 4

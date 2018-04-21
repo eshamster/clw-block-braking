@@ -1,4 +1,4 @@
-(defpackage clw-block-braking/src/game/score-register
+(defpackage clw-block-braking/game/score-register
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
@@ -8,7 +8,7 @@
            :get-score
            :score
            :score-time))
-(in-package :clw-block-braking/src/game/score-register)
+(in-package :clw-block-braking/game/score-register)
 
 (defstruct.ps+ score (time 0))
 

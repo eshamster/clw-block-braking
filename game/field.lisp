@@ -1,4 +1,4 @@
-(defpackage clw-block-braking/src/game/field
+(defpackage clw-block-braking/game/field
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
@@ -7,9 +7,9 @@
            :init-field
            :field-width
            :field-height)
-  (:import-from :clw-block-braking/src/game/parameter
+  (:import-from :clw-block-braking/game/parameter
                 :get-param))
-(in-package :clw-block-braking/src/game/field)
+(in-package :clw-block-braking/game/field)
 
 (defvar.ps+ *field* nil)
 

@@ -1,41 +1,41 @@
-(defpackage clw-block-braking/src/game/clw-block-braking-state
+(defpackage clw-block-braking/game/clw-block-braking-state
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :make-game-menu-state)
-  (:import-from :clw-block-braking/src/game/field
+  (:import-from :clw-block-braking/game/field
                 :init-field
                 :get-field
                 :field-height)
-  (:import-from :clw-block-braking/src/game/ball
+  (:import-from :clw-block-braking/game/ball
                 :make-ball
                 :reset-ball
                 :stop-ball)
-  (:import-from :clw-block-braking/src/game/stage-generator
+  (:import-from :clw-block-braking/game/stage-generator
                 :generate-stage
                 :get-max-stage-number)
-  (:import-from :clw-block-braking/src/game/controller
+  (:import-from :clw-block-braking/game/controller
                 :init-controller)
-  (:import-from :clw-block-braking/src/game/life
+  (:import-from :clw-block-braking/game/life
                 :add-life-decrease-event
                 :init-life)
-  (:import-from :clw-block-braking/src/game/paddle
+  (:import-from :clw-block-braking/game/paddle
                 :make-paddle)
-  (:import-from :clw-block-braking/src/game/score-register
+  (:import-from :clw-block-braking/game/score-register
                 :init-score-register
                 :register-score
                 :get-score
                 :score-time)
-  (:import-from :clw-block-braking/src/game/timer
+  (:import-from :clw-block-braking/game/timer
                 :init-timer
                 :start-timer
                 :stop-timer
                 :reset-timer
                 :get-current-sec)
-  (:import-from :clw-block-braking/src/game/wall
+  (:import-from :clw-block-braking/game/wall
                 :init-wall))
-(in-package :clw-block-braking/src/game/clw-block-braking-state)
+(in-package :clw-block-braking/game/clw-block-braking-state)
 
 (defun.ps+ get-current-ball ()
   (let ((current-ball (find-a-entity-by-tag :ball)))

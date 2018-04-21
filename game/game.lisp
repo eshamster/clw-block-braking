@@ -1,13 +1,13 @@
-(defpackage clw-block-braking/src/game/game
+(defpackage clw-block-braking/game/game
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :init-func
            :update-func)
-  (:import-from :clw-block-braking/src/game/clw-block-braking-state
+  (:import-from :clw-block-braking/game/clw-block-braking-state
                 :make-game-menu-state))
-(in-package :clw-block-braking/src/game/game)
+(in-package :clw-block-braking/game/game)
 
 (defun.ps+ init-func (scene)
   (init-game-state (make-game-menu-state))

@@ -1,13 +1,13 @@
-(defpackage clw-block-braking/src/server
+(defpackage clw-block-braking/server
   (:use :cl
         :cl-web-2d-game
         :cl-markup)
   (:export :start
            :stop)
-  (:import-from :clw-block-braking/src/game/game
+  (:import-from :clw-block-braking/game/game
                 :init-func
                 :update-func))
-(in-package :clw-block-braking/src/server)
+(in-package :clw-block-braking/server)
 
 ;; --- Definitions about directories --- ;;
 

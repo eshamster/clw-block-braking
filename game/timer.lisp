@@ -1,4 +1,4 @@
-(defpackage clw-block-braking/src/game/timer
+(defpackage clw-block-braking/game/timer
   (:use :cl
         :ps-experiment
         :cl-ps-ecs
@@ -8,7 +8,7 @@
            :stop-timer
            :reset-timer
            :get-current-sec))
-(in-package :clw-block-braking/src/game/timer)
+(in-package :clw-block-braking/game/timer)
 
 (defun.ps+ find-timer ()
   (find-a-entity-by-tag :timer))
