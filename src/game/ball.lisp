@@ -149,7 +149,9 @@
     (adjust-angle-by-paddle ball paddle)))
 
 ;; To avoid to sink into target
-(defun.ps+ adjust-ball-pnt-after-reflection (ball target pre-point)
+(defun.ps+ reverse-ball-to-not-collide-point (ball target pre-point)
+  "When the ball collides to the target, reverse the ball to point where they don't collide.
+Return reversed distance."
   (check-entity-tags ball :ball)
   (let* ((point (get-ecs-component 'point-2d ball))
          (not-adjusted-point (clone-point-2d point))
@@ -165,25 +167,28 @@
           (copy-point-2d-to min-point point))
       (lerp-vector-2d min-point max-point 0.5
                       point))
-    ;; Advance position of the ball to direction after reflection
-    (let ((angle (get-entity-param ball :angle))
-          (dist (calc-dist point not-adjusted-point)))
-      (incf (point-2d-x point) (* dist (cos angle)))
-      (incf (point-2d-y point) (* dist (sin angle))))))
+    ;; Calculate reversed distance
+    (calc-dist point not-adjusted-point)))
 
 (defun.ps+ process-collide (ball target)
   (check-entity-tags ball :ball)
-  (cond ((or (has-entity-tag target :block)
-             (has-entity-tag target :wall))
-         (unless (get-entity-param ball :col-to-block-p)
-           (reflect-to-block ball target)
-           (set-entity-param ball :col-to-block-p t)))
-        ((has-entity-tag target :paddle)
-         (when (get-entity-param ball :enable-col-to-paddle-p)
-           (reflect-to-paddle ball target)
-           (set-entity-param ball :enable-col-to-paddle-p nil)))
-        (t (error "Collides to unknown object.")))
-  (adjust-ball-pnt-after-reflection ball target (get-entity-param ball :pre-point)))
+  (let ((rest-dist (reverse-ball-to-not-collide-point
+                    ball target (get-entity-param ball :pre-point))))
+    (cond ((or (has-entity-tag target :block)
+               (has-entity-tag target :wall))
+           (unless (get-entity-param ball :col-to-block-p)
+             (reflect-to-block ball target)
+             (set-entity-param ball :col-to-block-p t)))
+          ((has-entity-tag target :paddle)
+           (when (get-entity-param ball :enable-col-to-paddle-p)
+             (reflect-to-paddle ball target)
+             (set-entity-param ball :enable-col-to-paddle-p nil)))
+          (t (error "Collides to unknown object.")))
+    ;; proceed rest distance
+    (let ((point (get-ecs-component 'point-2d ball))
+          (angle (get-entity-param ball :angle)))
+      (incf (point-2d-x point) (* rest-dist (cos angle)))
+      (incf (point-2d-y point) (* rest-dist (sin angle))))))
 
 (defun.ps+ ball-is-above-paddle-p (ball paddle)
   (> (- (vector-2d-y (calc-global-point ball))
