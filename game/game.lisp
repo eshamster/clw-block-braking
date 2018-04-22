@@ -5,12 +5,12 @@
         :cl-web-2d-game)
   (:export :init-func
            :update-func)
-  (:import-from :clw-block-braking/game/clw-block-braking-state
-                :make-game-menu-state))
+  (:import-from :clw-block-braking/game/state/package
+                :init-clw-block-braking-state))
 (in-package :clw-block-braking/game/game)
 
 (defun.ps+ init-func (scene)
-  (init-game-state (make-game-menu-state))
+  (init-clw-block-braking-state)
   (init-default-systems :scene scene)
   (init-input))
 
