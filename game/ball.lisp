@@ -76,10 +76,14 @@
   (unless (get-entity-param ball :on-paddle-p)
     (move-ball-normally ball)))
 
-(defun.ps+ calc-base-speed-by-paddle-lane (lane)
-  (lerp-scalar (get-param :ball :speed :base :min)
-               (get-param :ball :speed :base :max)
-               (/ lane (- (get-param :paddle :lane-count) 1.0))))
+(defun.ps+ calc-current-speed (ball)
+  (check-entity-tags :ball)
+  (let ((lane (get-entity-param (get-entity-param ball :paddle)
+                                :lane)))
+    (* (lerp-scalar (get-param :ball :speed :base :min)
+                    (get-param :ball :speed :base :max)
+                    (/ lane (- (get-param :paddle :lane-count) 1.0)))
+       (get-entity-param ball :speed-scale))))
 
 ;; The rect-pnt is left-bottom point of the rect.
 (defun.ps+ calc-col-direction (ball rect-global-pnt rect-width rect-height)
@@ -178,7 +182,12 @@ Return reversed distance."
                (has-entity-tag target :wall))
            (unless (get-entity-param ball :col-to-block-p)
              (reflect-to-block ball target)
-             (set-entity-param ball :col-to-block-p t)))
+             (set-entity-param ball :col-to-block-p t))
+           (when (has-entity-tag target :block)
+             (let ((speed-scale (+ (get-entity-param ball :speed-scale)
+                                   (get-param :ball :speed :accell-scale :per-block))))
+               (set-entity-param ball :speed-scale
+                                 (min speed-scale (get-param :ball :speed :accell-scale :max))))))
           ((has-entity-tag target :paddle)
            (when (get-entity-param ball :enable-col-to-paddle-p)
              (reflect-to-paddle ball target)
@@ -213,12 +222,12 @@ Return reversed distance."
                                                (clone-point-2d (get-ecs-component 'point-2d entity)))
                              (move-ball entity)
                              (set-entity-param entity :speed
-                                               (calc-base-speed-by-paddle-lane
-                                                (get-entity-param paddle :lane)))))
+                                               (calc-current-speed entity))))
      (make-physic-circle :target-tags '(:block :paddle :wall)
                          :r r
                          :on-collision #'process-collide)
      (init-entity-params :speed 0
+                         :speed-scale 1
                          :angle (/ PI 3.9)
                          :col-to-block-p nil ; reflect once per frame at most
                          :enable-col-to-paddle-p t

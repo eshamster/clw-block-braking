@@ -6,7 +6,8 @@
   (:export :make-rect-block)
   (:import-from :clw-block-braking/game/field
                 :field-width
-                :field-height))
+                :field-height
+                :get-field))
 (in-package :clw-block-braking/game/block)
 
 (defun.ps+ add-block-braking-animation (blk)
@@ -37,7 +38,7 @@
         model-2d
         anime-2d)
        (start-animation anime-2d)
-       (add-ecs-entity-to-buffer entity (clw-block-braking/game/field:get-field))))))
+       (add-ecs-entity-to-buffer entity (get-field))))))
 
 (defun.ps+ make-rect-block (x y width height)
   (let ((blk (make-ecs-entity)))
