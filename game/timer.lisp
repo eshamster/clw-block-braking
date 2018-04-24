@@ -51,8 +51,7 @@
                                  :margin 10)
        (make-script-2d :func (lambda (entity)
                                (when (get-entity-param entity :enable-p)
-                                 (set-entity-param entity :frame-count
-                                                   (1+ (get-entity-param entity :frame-count))))
+                                 (aset-entity-param entity :frame-count (1+ it)))
                                (display-timer entity)))
        (init-entity-params :frame-count 0
                            :enable-p nil))

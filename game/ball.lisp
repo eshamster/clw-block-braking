@@ -26,13 +26,11 @@
 
 (defun.ps+ reflect-by-vertical (ball)
   (check-entity-tags ball :ball)
-  (set-entity-param ball :angle
-                    (- PI (get-entity-param ball :angle))))
+  (aset-entity-param ball :angle (- PI it)))
 
 (defun.ps+ reflect-by-horizontal (ball)
   (check-entity-tags ball :ball)
-  (set-entity-param ball :angle
-                    (* (get-entity-param ball :angle) -1)))
+  (aset-entity-param ball :angle (* it -1)))
 
 (defun.ps+ move-ball-normally (ball)
   (check-entity-tags ball :ball)
