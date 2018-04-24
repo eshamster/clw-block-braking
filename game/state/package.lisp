@@ -4,6 +4,7 @@
         :clw-block-braking/game/state/all-clear
         :clw-block-braking/game/state/stage-clear
         :clw-block-braking/game/state/gameover
+        :clw-block-braking/game/state/global-init
         :clw-block-braking/game/state/init
         :clw-block-braking/game/state/interval
         :clw-block-braking/game/state/main
@@ -19,9 +20,10 @@
 (defun.ps+ init-clw-block-braking-state ()
   (register-state-maker :all-clear #'make-game-all-clear-state)
   (register-state-maker :gameover #'make-game-gameover-state)
+  (register-state-maker :global-init #'make-game-global-init-state)
   (register-state-maker :init #'make-game-init-state)
   (register-state-maker :interval #'make-game-interval-state)
   (register-state-maker :main #'make-game-main-state)
   (register-state-maker :menu #'make-game-menu-state)
   (register-state-maker :stage-clear #'make-game-stage-clear-state)
-  (init-game-state (make-state :menu)))
+  (init-game-state (make-state :global-init)))
