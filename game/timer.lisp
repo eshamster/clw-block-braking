@@ -55,6 +55,6 @@
                                                    (1+ (get-entity-param entity :frame-count))))
                                (display-timer entity)))
        (init-entity-params :frame-count 0
-                           :enable-p nil)))
-    (display-timer timer)
+                           :enable-p nil))
+      (display-timer timer))
     (add-ecs-entity timer)))
