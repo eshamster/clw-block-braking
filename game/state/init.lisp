@@ -5,7 +5,8 @@
         :cl-web-2d-game)
   (:export :make-game-init-state)
   (:import-from :clw-block-braking/game/state/utils
-                :make-state)
+                :make-state
+                :def-game-state)
   (:import-from :clw-block-braking/game/ball
                 :make-ball)
   (:import-from :clw-block-braking/game/controller
@@ -25,26 +26,25 @@
                 :init-wall))
 (in-package :clw-block-braking/game/state/init)
 
-(defstruct.ps+
-    (game-init-state
-     (:include game-state
-               (start-process
-                (lambda (_this)
-                  (declare (ignore _this))
-                  (init-field)
-                  (init-controller)
-                  (let*  ((field (get-field))
-                          (paddle (make-paddle field))
-                          (ball (make-ball field paddle)))
-                    (add-ecs-entity-to-buffer paddle field)
-                    (add-ecs-entity-to-buffer ball field)
-                    (init-wall field)
-                    (init-life field))
-                  (init-timer)
-                  (init-score-register)
-                  t))
-               (process
-                (lambda (_this)
-                  (declare (ignore _this))
-                  (make-state :main
-                              :stage-number 1))))))
+(def-game-state init ()
+  :start-process
+  (lambda (_this)
+    (declare (ignore _this))
+    (init-field)
+    (init-controller)
+    (let*  ((field (get-field))
+            (paddle (make-paddle field))
+            (ball (make-ball field paddle)))
+      (add-ecs-entity-to-buffer paddle field)
+      (add-ecs-entity-to-buffer ball field)
+      (init-wall field)
+      (init-life field))
+    (init-timer)
+    (init-score-register)
+    t)
+
+  :process
+  (lambda (_this)
+    (declare (ignore _this))
+    (make-state :main
+                :stage-number 1)))

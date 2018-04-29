@@ -5,6 +5,7 @@
         :cl-web-2d-game)
   (:export :register-state-maker
            :make-state
+           :def-game-state
 
            :get-current-ball
            :reset-ball-on-field
@@ -22,6 +23,21 @@
 
 (defun.ps+ register-state-maker (kind func)
   (setf (gethash kind *state-maker-table*) func))
+
+;; --- (experimental macro) --- ;;
+
+(defmacro.ps+ def-game-state (name (&rest params) &key start-process process end-process)
+  `(progn
+     (defstruct.ps+
+         (,(intern (format nil "GAME-~A-STATE" name))
+           (:include game-state
+                     ,@(append (when start-process
+                                 `((start-process ,start-process)))
+                               (when process
+                                 `((process ,process)))
+                               (when end-process
+                                 `((end-process ,end-process))))))
+         ,@params)))
 
 ;; --- other utils --- ;;
 
