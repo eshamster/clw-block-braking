@@ -28,7 +28,8 @@
                  (decf-vector (clone-vector-2d gravity-point)
                               target-point)
                  (get-param :gravity :value))))
-    (incf-vector target-vector accell)))
+    (incf-vector target-vector accell)
+    (setf-vector-abs target-vector pre-abs)))
 
 (defun.ps+ find-gravity-entity ()
   (find-a-entity-by-tag :gravity))
@@ -135,9 +136,8 @@
                      (+ (vector-abs speed)
                         (- new-base-speed-abs pre-base-speed-abs)))
     (let ((grav-entity (find-gravity-entity)))
-      (if grav-entity
-          (add-gravity-effect ball grav-entity)
-          (setf-vector-abs speed new-base-speed-abs)))))
+      (when grav-entity
+        (add-gravity-effect ball grav-entity)))))
 
 ;; The rect-pnt is left-bottom point of the rect.
 (defun.ps+ calc-col-direction (ball rect-global-pnt rect-width rect-height)
