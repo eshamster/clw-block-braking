@@ -31,6 +31,9 @@
                   :path "/images/paddle_marker.png"
                   :alpha-path "/images/paddle_marker_alpha.png"
                   :y 0.5 :height 0.5)
+    (load-texture :name "gravity_block"
+                  :path "/images/gravity_block.png"
+                  :alpha-path "/images/gravity_block_alpha.png")
     (setf-collider-model-enable nil)
     t)
 
