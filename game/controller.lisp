@@ -42,16 +42,28 @@
 ;; --- initialization --- ;;
 
 (defun.ps+ make-mouse-entity ()
-  (let ((mouse (make-ecs-entity)))
+  (let ((mouse (make-ecs-entity))
+        (r 3))
     (add-entity-tag mouse :mouse)
     (add-ecs-component-list
      mouse
      (make-point-2d)
+     (make-model-2d :model (make-solid-circle :r r :color #x000000)
+                    :depth 100)
+     (make-model-2d :model (make-wired-circle :r 10 :color #x000000)
+                    :depth 100)
      (make-physic-circle
-      :r 0
+      :r 3
       :on-collision
       (lambda (mine target)
-        (set-entity-param mine :current-target target)))
+        (let ((pre-target (get-entity-param mine :current-target))
+              (mine-point (calc-global-point mine)))
+          ;; In case where multiple targets are collided in a frame,
+          ;; choose the nearest target.
+          (when (or (not pre-target)
+                    (< (calc-dist-p2 mine (calc-global-point target))
+                       (calc-dist-p2 mine (calc-global-point pre-target))))
+            (set-entity-param mine :current-target target)))))
      (make-script-2d
       :func (lambda (entity)
               ;; update point
