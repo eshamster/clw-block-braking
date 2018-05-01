@@ -32,26 +32,28 @@
        (add-ecs-component-list
         entity
         (make-point-2d :x (- (point-2d-x blk-point)
-                             (/ (* (get-entity-param blk :width) (1- scale)) 2))
+                             (* (get-entity-param blk :width) (1- scale)))
                        :y (- (point-2d-y blk-point)
-                             (/ (* (get-entity-param blk :height) (1- scale)) 2)))
+                             (* (get-entity-param blk :height) (1- scale))))
         model-2d
         anime-2d)
        (start-animation anime-2d)
        (add-ecs-entity-to-buffer entity (get-field))))))
 
 (defun.ps+ make-rect-block (x y width height)
-  (let ((blk (make-ecs-entity)))
+  (let ((blk (make-ecs-entity))
+        (h-width (/ width 2))
+        (h-height (/ height 2)))
     (add-entity-tag blk :block)
     (add-ecs-component-list
      blk
-     (make-point-2d :x x :y y)
+     (make-point-2d :x (+ x h-width) :y (+ y h-height))
      (make-physic-polygon
       :target-tags '(:ball :mouse)
-      :pnt-list (list (make-point-2d :x 0 :y 0)
-                      (make-point-2d :x width :y 0)
-                      (make-point-2d :x width :y height)
-                      (make-point-2d :x 0 :y height))
+      :pnt-list (list (make-point-2d :x (* -1 h-width) :y (* -1 h-height))
+                      (make-point-2d :x h-width :y (* -1 h-height))
+                      (make-point-2d :x h-width :y h-height)
+                      (make-point-2d :x (* -1 h-width) :y h-height))
       :on-collision (lambda (mine target)
                       (when (has-entity-tag target :ball)
                         (register-next-frame-func

@@ -25,20 +25,24 @@
        field))))
 
 (defun.ps+ make-a-wall (x y width height)
-  (let ((wall (make-ecs-entity)))
+  (let ((wall (make-ecs-entity))
+        (h-width (/ width 2))
+        (h-height (/ height 2)))
     (add-entity-tag wall :wall)
     (add-ecs-component-list
      wall
-     (make-point-2d :x x :y y)
+     (make-point-2d :x (+ x h-width) :y (+ y h-height))
      (make-model-2d :model (make-wired-rect :width width :height height
                                             :color #xff0000)
+                    :offset (make-point-2d :x (* -1 h-width)
+                                           :y (* -1 h-height))
                     :depth 100)
      (make-physic-polygon
       :target-tags '(:ball)
-      :pnt-list (list (make-point-2d :x 0 :y 0)
-                      (make-point-2d :x width :y 0)
-                      (make-point-2d :x width :y height)
-                      (make-point-2d :x 0 :y height)))
+      :pnt-list (list (make-point-2d :x (* -1 h-width) :y (* -1 h-height))
+                      (make-point-2d :x h-width :y (* -1 h-height))
+                      (make-point-2d :x h-width :y h-height)
+                      (make-point-2d :x (* -1 h-width) :y h-height)))
      (init-entity-params :width width
                          :height height))
     wall))

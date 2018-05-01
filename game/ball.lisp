@@ -145,8 +145,8 @@
   (let* ((ball-pnt (calc-global-point ball))
          (ball-x (vector-2d-x ball-pnt))
          (ball-y (vector-2d-y ball-pnt))
-         (rect-x (vector-2d-x rect-global-pnt))
-         (rect-y (vector-2d-y rect-global-pnt))
+         (rect-x (- (vector-2d-x rect-global-pnt) (/ rect-width 2)))
+         (rect-y (- (vector-2d-y rect-global-pnt) (/ rect-height 2)))
          ;; opz = outer product z
          (opz1 (calc-outer-product-z
                 (make-vector-2d :x rect-width :y rect-height)
