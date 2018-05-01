@@ -47,7 +47,7 @@
      blk
      (make-point-2d :x x :y y)
      (make-physic-polygon
-      :target-tags '(:ball)
+      :target-tags '(:ball :mouse)
       :pnt-list (list (make-point-2d :x 0 :y 0)
                       (make-point-2d :x width :y 0)
                       (make-point-2d :x width :y height)

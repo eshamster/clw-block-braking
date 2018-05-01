@@ -36,7 +36,8 @@
            :dist-from-paddle #ly10)
     :paddle (:width (:min #lx130 :max #lx55)
              :height #ly10 :depth 8
-             :base-line-height #ly80 :lane-space #ly30 :lane-count 4))))
+             :base-line-height #ly80 :lane-space #ly30 :lane-count 4)
+    :gravity (:value #ly1 :range #ly200))))
 
 (defmacro.ps+ get-param (&rest keys)
   `(get-layered-hash *params* ,@keys))

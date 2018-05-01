@@ -68,7 +68,9 @@
        (lambda (model)
          (add-ecs-component-list
           result
-          (make-model-2d :model model))))
+          (make-model-2d :model model
+                         :offset (make-point-2d :x (/ width -2)
+                                                :y (/ height -2))))))
       result)))
 
 (defun.ps+ generate-stage (stage-number field)
