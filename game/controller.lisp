@@ -52,9 +52,10 @@
 
 (defun.ps+ add-gravity-to-entity (entity)
   (check-type entity ecs-entity)
-  ;; only one block can have gravity
-  (delete-gravity-from-current)
   (let ((pre-entity (find-a-entity-by-tag :gravity)))
+    ;; only one block can have gravity
+    (when pre-entity
+      (delete-gravity-from-current))
     (when (eq entity pre-entity)
       (return-from add-gravity-to-entity)))
   (assert (not (find-a-entity-by-tag :gravity)))
