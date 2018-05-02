@@ -2,6 +2,10 @@
     --monitor-top: 50px;
 }
 
+#renderer {
+    cursor: none;
+}
+
 .log-panel {
     position: fixed;
     padding: 5px;
