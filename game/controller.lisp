@@ -74,18 +74,18 @@
   (with-ecs-components (point-2d) entity
     (setf (point-2d-x point-2d) (get-mouse-x)
           (point-2d-y point-2d) (get-mouse-y)))
-  ;; add gravity to current target
   (when (eq (get-left-mouse-state) :down-now)
-    (let ((target (get-entity-param entity :current-target)))
-      (if target
-          (add-gravity-to-entity target)
-          (delete-gravity-from-current))))
+    (let ((ball (find-a-entity-by-tag :ball)))
+      (assert ball)
+      (if (ball-shot-p ball)
+          ;; add gravity to current target
+          (let ((target (get-entity-param entity :current-target)))
+            (if target
+                (add-gravity-to-entity target)
+                (delete-gravity-from-current)))
+          ;; shoot ball
+          (shoot-ball ball))))
   (set-entity-param entity :current-target nil)
-  ;; shoot ball
-  (let ((ball (find-a-entity-by-tag :ball)))
-    (assert ball)
-    (when (= (get-left-mouse-state) :down-now)
-      (shoot-ball ball)))
   ;; move paddle
   (let ((paddle (find-a-entity-by-tag :paddle)))
     (let ((wheel (get-mouse-wheel-delta-y)))
