@@ -44,13 +44,21 @@
                                    :margin margin
                                    :x font-size
                                    :y (* (+ stage-count 5) (+ font-size margin)))))
-        (dotimes (i stage-count)
-          (let ((stage (1+ i)))
-            (add-text-to-area area
-                              ;; XXX: This is invalid as CL code
-                              :text (+ "Stage" stage ": "
-                                       (score-time (get-score stage)))
-                              :color #xff8800)))
+        (let ((total-score 0))
+          (dotimes (i stage-count)
+            (let* ((stage (1+ i))
+                   (score (score-time (get-score stage))))
+              (add-text-to-area area
+                                ;; XXX: This is invalid as CL code
+                                :text (+ "Stage" stage ": " score)
+                                :color #xff8800)
+              (incf total-score score)))
+          (add-text-to-area area
+                            :text "------"
+                            :color #xff0088)
+          (add-text-to-area area
+                            :text (+ "TOTAL: " total-score)
+                            :color #xff8800))
         (add-ecs-entity area field)))
     t)
 
