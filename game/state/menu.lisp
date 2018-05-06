@@ -9,10 +9,10 @@
                 :def-game-state))
 (in-package :clw-block-braking/game/state/menu)
 
-(def-game-state menu ()
+(def-game-state menu ((dummy-parent (make-ecs-entity)))
   :start-process
   (lambda (_this)
-    (declare (ignore _this))
+    (add-ecs-entity (slot-value _this 'dummy-parent))
     (let* ((font-size 25)
            (margin 20)
            (area (make-text-area :font-size font-size :text-align :center
@@ -34,5 +34,5 @@
 
   :end-process
   (lambda (_this)
-    (declare (ignore _this))
+    (delete-ecs-entity (slot-value _this 'dummy-parent))
     t))
