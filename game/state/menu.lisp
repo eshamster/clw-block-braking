@@ -11,6 +11,21 @@
                 :def-game-state))
 (in-package :clw-block-braking/game/state/menu)
 
+(defun.ps+ make-mouse-pointer ()
+  (let ((mouse (make-ecs-entity))
+        (r 3))
+    (add-ecs-component-list
+     mouse
+     (make-point-2d)
+     (make-model-2d :model (make-solid-circle :r r :color #xff0088)
+                    :depth 100)
+     (make-script-2d
+      :func (lambda (entity)
+              (with-ecs-components (point-2d) entity
+                (setf (point-2d-x point-2d) (get-mouse-x)
+                      (point-2d-y point-2d) (get-mouse-y))))))
+    mouse))
+
 (def-game-state menu ((dummy-parent (make-ecs-entity))
                       next-state)
   :start-process
@@ -23,7 +38,9 @@
                                  :y (+ (/ (get-screen-height) 2)
                                        (+ (* font-size 2) margin))))
            (dummy-parent (slot-value _this 'dummy-parent)))
+      ;; dummy parent
       (add-ecs-entity dummy-parent)
+      ;; text area
       (add-text-to-area area
                         :text "Click to start"
                         :color #x00ffff)
@@ -41,8 +58,10 @@
                           (make-vector-2d :x h-width :y h-height)
                           (make-vector-2d :x (* -1 h-width) :y h-height)))))
       (setf-collider-model-enable t)
-      (add-ecs-entity area dummy-parent))
+      (add-ecs-entity area dummy-parent)
       (setf-collider-model-enable nil)
+      ;; mouse
+      (add-ecs-entity (make-mouse-pointer) dummy-parent))
     t)
 
   :process
