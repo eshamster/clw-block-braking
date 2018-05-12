@@ -32,34 +32,38 @@
   (lambda (_this)
     (let* ((font-size 25)
            (margin 20)
+           (center-x (/ (get-screen-width) 2))
+           (top-y (+ (/ (get-screen-height) 2)
+                     (+ (* font-size 2) margin)))
            (area (make-text-area :font-size font-size :text-align :center
                                  :margin margin
-                                 :x (/ (get-screen-width) 2)
-                                 :y (+ (/ (get-screen-height) 2)
-                                       (+ (* font-size 2) margin))))
+                                 :x center-x
+                                 :y top-y))
            (dummy-parent (slot-value _this 'dummy-parent)))
       ;; dummy parent
       (add-ecs-entity dummy-parent)
       ;; text area
-      (add-text-to-area area
-                        :text "Click to start"
-                        :color #x00ffff)
-      (let ((h-width (/ (* 0.8 (get-screen-width)) 2))
-            (h-height (/ (* 0.2 (get-screen-height)) 2)))
-        (add-ecs-component-list
-         area
-         (make-ui-component :on-click (lambda (_)
-                                        (declare (ignore _))
-                                        (setf (slot-value _this 'next-state)
-                                              (make-state :init))))
-         (make-physic-polygon
-          :pnt-list (list (make-vector-2d :x (* -1 h-width) :y (* -1 h-height))
-                          (make-vector-2d :x h-width :y (* -1 h-height))
-                          (make-vector-2d :x h-width :y h-height)
-                          (make-vector-2d :x (* -1 h-width) :y h-height)))))
-      (setf-collider-model-enable t)
-      (add-ecs-entity area dummy-parent)
-      (setf-collider-model-enable nil)
+      (frame-promise-then
+       (add-text-to-area area
+                         :text "Click here to start"
+                         :color #x00ffff)
+       ;; Note: shadow "area"
+       (lambda (area)
+         (let* ((area-size (get-text-area-size area))
+                (h-width (/ (getf area-size :width) 2))
+                (height (getf area-size :height)))
+           (add-ecs-component-list
+            area
+            (make-ui-component :on-click (lambda (_)
+                                           (declare (ignore _))
+                                           (setf (slot-value _this 'next-state)
+                                                 (make-state :init))))
+            (make-physic-polygon
+             :pnt-list (list (make-vector-2d :x (* -1 h-width) :y (- (* -1 height) margin))
+                             (make-vector-2d :x h-width :y (- (* -1 height) margin))
+                             (make-vector-2d :x h-width :y (* margin -1))
+                             (make-vector-2d :x (* -1 h-width) :y (* margin -1))))))
+         (add-ecs-entity area dummy-parent)))
       ;; mouse
       (add-ecs-entity (make-mouse-pointer) dummy-parent))
     t)
