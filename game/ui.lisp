@@ -6,11 +6,11 @@
   (:export :init-ui-system
            :ui-component
            :make-ui-component
-           :ui-component-on-click))
+           :ui-component-on-click-up))
 (in-package :clw-block-braking/game/ui)
 
 (defstruct.ps+ (ui-component (:include ecs-component))
-    on-click
+    on-click-up
   on-hover
   on-not-hover)
 
@@ -45,9 +45,9 @@
                 (when (and collide-p
                            (eq *current-target* entity)
                            (find-the-entity entity))
-                  (let ((on-click (ui-component-on-click ui-component)))
-                    (when on-click
-                      (funcall on-click nil))))
+                  (let ((on-click-up (ui-component-on-click-up ui-component)))
+                    (when on-click-up
+                      (funcall on-click-up nil))))
                 (setf *current-target* nil))))))))))
 
 (defun.ps+ init-ui-system ()
