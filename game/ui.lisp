@@ -23,11 +23,11 @@
       (target-component-types '(point-2d ui-component physic-2d))
       (process
        (lambda (entity)
-         (with-ecs-components (point-2d physic-2d ui-component) entity
+         (with-ecs-components (physic-2d ui-component) entity
            (let* ((mouse-pnt (make-point-2d :x (get-mouse-x)
                                             :y (get-mouse-y)))
                   (mouse-physic (make-physic-circle :r 0))
-                  (collide-p (collide-physics-p physic-2d point-2d
+                  (collide-p (collide-physics-p physic-2d (calc-global-point entity)
                                                 mouse-physic mouse-pnt)))
              ;; hover
              (with-slots (on-hover on-not-hover) ui-component
