@@ -51,19 +51,36 @@
        (lambda (area)
          (let* ((area-size (get-text-area-size area))
                 (h-width (/ (getf area-size :width) 2))
-                (height (getf area-size :height)))
+                (height (getf area-size :height))
+                (hover-model (make-model-2d :model (make-wired-rect :width (* 2 h-width)
+                                                                    :height height
+                                                                    :color #xff8800)
+                                            :offset (make-point-2d :x (* -1 h-width)
+                                                                   :y (- (* -1 height)
+                                                                         margin))
+                                            :depth 100)))
            (add-ecs-component-list
             area
             (make-ui-component :on-click (lambda (_)
                                            (declare (ignore _))
                                            (setf (slot-value _this 'next-state)
-                                                 (make-state :init))))
+                                                 (make-state :init)))
+                               :on-hover (lambda (_)
+                                           (declare (ignore _))
+                                           (enable-model-2d area
+                                                            :target-model-2d hover-model))
+                               :on-not-hover (lambda (_)
+                                               (declare (ignore _))
+                                               (disable-model-2d area
+                                                                 :target-model-2d hover-model)))
             (make-physic-polygon
              :pnt-list (list (make-vector-2d :x (* -1 h-width) :y (- (* -1 height) margin))
                              (make-vector-2d :x h-width :y (- (* -1 height) margin))
                              (make-vector-2d :x h-width :y (* margin -1))
-                             (make-vector-2d :x (* -1 h-width) :y (* margin -1))))))
-         (add-ecs-entity area dummy-parent)))
+                             (make-vector-2d :x (* -1 h-width) :y (* margin -1))))
+            hover-model)
+           (add-ecs-entity area dummy-parent)
+           (disable-model-2d area :target-model-2d hover-model))))
       ;; mouse
       (add-ecs-entity (make-mouse-pointer) dummy-parent))
     t)

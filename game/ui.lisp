@@ -10,7 +10,9 @@
 (in-package :clw-block-braking/game/ui)
 
 (defstruct.ps+ (ui-component (:include ecs-component))
-    on-click)
+    on-click
+  on-hover
+  on-not-hover)
 
 (defvar.ps+ *current-target* nil)
 
@@ -22,24 +24,31 @@
       (process
        (lambda (entity)
          (with-ecs-components (point-2d physic-2d ui-component) entity
-           (when (ui-component-on-click ui-component)
-             (let* ((mouse-pnt (make-point-2d :x (get-mouse-x)
-                                              :y (get-mouse-y)))
-                    (mouse-physic (make-physic-circle :r 0))
-                    (collide-p (collide-physics-p physic-2d point-2d
-                                                  mouse-physic mouse-pnt)))
-               (case (get-left-mouse-state)
-                 (:down-now
-                  (when collide-p
-                    (setf *current-target* entity)))
-                 (:up-now
-                  (when (and collide-p
-                             (eq *current-target* entity)
-                             (find-the-entity entity))
-                    (let ((on-click (ui-component-on-click ui-component)))
-                      (when on-click
-                        (funcall on-click nil))))
-                  (setf *current-target* nil)))))))))))
+           (let* ((mouse-pnt (make-point-2d :x (get-mouse-x)
+                                            :y (get-mouse-y)))
+                  (mouse-physic (make-physic-circle :r 0))
+                  (collide-p (collide-physics-p physic-2d point-2d
+                                                mouse-physic mouse-pnt)))
+             ;; hover
+             (with-slots (on-hover on-not-hover) ui-component
+               (if collide-p
+                   (when on-hover
+                     (funcall on-hover nil))
+                   (when on-not-hover
+                     (funcall on-not-hover nil))))
+             ;; click
+             (case (get-left-mouse-state)
+               (:down-now
+                (when collide-p
+                  (setf *current-target* entity)))
+               (:up-now
+                (when (and collide-p
+                           (eq *current-target* entity)
+                           (find-the-entity entity))
+                  (let ((on-click (ui-component-on-click ui-component)))
+                    (when on-click
+                      (funcall on-click nil))))
+                (setf *current-target* nil))))))))))
 
 (defun.ps+ init-ui-system ()
   (make-ui-system))
