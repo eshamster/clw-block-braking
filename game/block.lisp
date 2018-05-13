@@ -4,6 +4,8 @@
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :make-rect-block)
+  (:import-from :clw-block-braking/game/ui
+                :make-ui-component)
   (:import-from :clw-block-braking/game/field
                 :field-width
                 :field-height
@@ -40,6 +42,29 @@
        (start-animation anime-2d)
        (add-ecs-entity-to-buffer entity (get-field))))))
 
+(defun.ps+ add-display-on-hover (blk width height)
+  (let* ((margin 2)
+         (hover-model (make-model-2d :model (make-wired-rect :width (+ width (* margin 2))
+                                                             :height (+ height (* margin 2))
+                                                             :color #xff8800)
+                                     :offset (make-point-2d
+                                              :x (- (/ width -2) margin)
+                                              :y (- (/ height -2) margin))
+                                     :depth 100)))
+    (add-ecs-component-list
+     blk
+     hover-model
+     (make-ui-component :on-hover (lambda (_)
+                                    (declare (ignore _))
+                                    (enable-model-2d blk
+                                                     :target-model-2d hover-model))
+                        :on-not-hover (lambda (_)
+                                        (declare (ignore _))
+                                        (disable-model-2d blk
+                                                          :target-model-2d hover-model))))
+    (disable-model-2d blk :target-model-2d hover-model)
+    blk))
+
 (defun.ps+ make-rect-block (x y width height)
   (let ((blk (make-ecs-entity))
         (h-width (/ width 2))
@@ -61,4 +86,5 @@
                         (add-block-braking-animation blk))))
      (init-entity-params :width width
                          :height height))
+    (add-display-on-hover blk width height)
     blk))
