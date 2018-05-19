@@ -6,10 +6,53 @@
   (:export :make-game-menu-state)
   (:import-from :clw-block-braking/game/ui
                 :make-ui-component)
+  (:import-from :clw-block-braking/game/stage-generator
+                :get-max-stage-number)
   (:import-from :clw-block-braking/game/state/utils
                 :make-state
                 :def-game-state))
 (in-package :clw-block-braking/game/state/menu)
+
+;; --- stage selector --- ;;
+
+(defun.ps+ increment-selector (selector delta)
+  (aset-entity-param selector :selected
+                     (mod (+ it delta)
+                          (length (get-entity-param selector :choices))))
+  ;; TODO: (temporal)
+  (add-to-event-log
+   (nth (get-entity-param selector :selected) (get-entity-param selector :choices))))
+
+(defun.ps+ generate-all-stage-list ()
+  (loop for i from 1 to (get-max-stage-number)
+     collect i))
+
+(defun.ps+ generate-stage-list (selector)
+  (let ((target (nth (get-entity-param selector :selected)
+                     (get-entity-param selector :choices))))
+    (case target
+      (:all (generate-all-stage-list))
+      (t (list target)))))
+
+(defun.ps+ make-stage-selector ()
+  (let ((selector (make-ecs-entity))
+        (choices (generate-all-stage-list)))
+    (push :all choices)
+    (add-entity-tag selector :stage-selector)
+    (add-ecs-component-list
+     selector
+     (make-script-2d
+      :func (lambda (entity)
+              (let ((wheel-delta (get-mouse-wheel-delta-y)))
+                (cond ((> wheel-delta 0)
+                       (increment-selector entity 1))
+                      ((< wheel-delta 0)
+                       (increment-selector entity -1))))))
+     (init-entity-params :choices choices
+                         :selected 0))
+    selector))
+
+;; --- mouse --- ;;
 
 (defun.ps+ make-mouse-pointer ()
   (let ((mouse (make-ecs-entity))
@@ -25,6 +68,8 @@
                 (setf (point-2d-x point-2d) (get-mouse-x)
                       (point-2d-y point-2d) (get-mouse-y))))))
     mouse))
+
+;; --- menu --- ;;
 
 (def-game-state menu ((dummy-parent (make-ecs-entity))
                       next-state)
@@ -64,7 +109,12 @@
             (make-ui-component :on-click-up (lambda (_)
                                               (declare (ignore _))
                                               (setf (slot-value _this 'next-state)
-                                                    (make-state :init)))
+                                                    (make-state :init))
+                                              ;; TODO: (temporal)
+                                              (add-to-event-log
+                                               (+ "Stages:"
+                                                  (generate-stage-list
+                                                   (find-a-entity-by-tag :stage-selector)))))
                                :on-hover (lambda (_)
                                            (declare (ignore _))
                                            (enable-model-2d area
@@ -82,11 +132,13 @@
            (add-ecs-entity area dummy-parent)
            (disable-model-2d area :target-model-2d hover-model))))
       ;; mouse
-      (add-ecs-entity (make-mouse-pointer) dummy-parent))
+      (add-ecs-entity (make-mouse-pointer) dummy-parent)
+      ;; stage selector
+      (add-ecs-entity (make-stage-selector) dummy-parent))
     t)
 
   :process
-  (lambda (_this)
+  (lambda (_this) 
     (slot-value _this 'next-state))
 
   :end-process
