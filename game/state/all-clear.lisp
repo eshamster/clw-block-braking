@@ -15,7 +15,9 @@
                 :get-score
                 :score-time)
   (:import-from :clw-block-braking/game/stage-generator
-                :get-max-stage-number))
+                :get-max-stage-number)
+  (:import-from :clw-block-braking/game/stage-manager
+                :get-selected-stage-list))
 (in-package :clw-block-braking/game/state/all-clear)
 
 (def-game-state all-clear ((first-frame t))
@@ -44,21 +46,22 @@
                                    :margin margin
                                    :x font-size
                                    :y (* (+ stage-count 5) (+ font-size margin)))))
-        (let ((total-score 0))
-          (dotimes (i stage-count)
-            (let* ((stage (1+ i))
-                   (score (score-time (get-score stage))))
+        (let ((total-score 0)
+              (stage-list (get-selected-stage-list)))
+          (dolist (stage stage-list)
+            (let ((score (score-time (get-score stage))))
               (add-text-to-area area
                                 ;; XXX: This is invalid as CL code
                                 :text (+ "Stage" stage ": " score)
                                 :color #xff8800)
               (incf total-score score)))
-          (add-text-to-area area
-                            :text "------"
-                            :color #xff0088)
-          (add-text-to-area area
-                            :text (+ "TOTAL: " total-score)
-                            :color #xff8800))
+          (when (> (length stage-list) 1)
+            (add-text-to-area area
+                              :text "------"
+                              :color #xff0088)
+            (add-text-to-area area
+                              :text (+ "TOTAL: " total-score)
+                              :color #xff8800)))
         (add-ecs-entity area field)))
     t)
 

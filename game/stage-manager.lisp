@@ -5,7 +5,8 @@
         :cl-web-2d-game)
   (:export :make-stage-manager
            :go-to-next-stage
-           :get-current-stage-number))
+           :get-current-stage-number
+           :get-selected-stage-list))
 (in-package :clw-block-braking/game/stage-manager)
 
 (defun.ps+ find-stage-manager ()
@@ -23,6 +24,10 @@
     (when (< current-index max-stage-index)
       (set-entity-param manager :current-stage-index (1+ current-index))
       (get-current-stage-number manager))))
+
+(defun.ps+ get-selected-stage-list (&optional (manager (find-stage-manager)))
+  (check-entity-tags manager :stage-manager)
+  (get-entity-param manager :stage-list))
 
 (defun.ps+ make-stage-manager (stage-list)
   (let ((manager (make-ecs-entity)))
