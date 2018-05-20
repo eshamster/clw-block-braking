@@ -109,12 +109,11 @@
             (make-ui-component :on-click-up (lambda (_)
                                               (declare (ignore _))
                                               (setf (slot-value _this 'next-state)
-                                                    (make-state :init))
-                                              ;; TODO: (temporal)
-                                              (add-to-event-log
-                                               (+ "Stages:"
-                                                  (generate-stage-list
-                                                   (find-a-entity-by-tag :stage-selector)))))
+                                                    (make-state
+                                                     :init
+                                                     :stage-list
+                                                     (generate-stage-list
+                                                      (find-a-entity-by-tag :stage-selector)))))
                                :on-hover (lambda (_)
                                            (declare (ignore _))
                                            (enable-model-2d area
