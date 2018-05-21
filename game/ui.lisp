@@ -47,8 +47,7 @@
                            (find-the-entity entity))
                   (let ((on-click-up (ui-component-on-click-up ui-component)))
                     (when on-click-up
-                      (funcall on-click-up nil))))
-                (setf *current-target* nil))))))))))
+                      (funcall on-click-up nil)))))))))))))
 
 (defun.ps+ init-ui-system ()
   (make-ui-system))
