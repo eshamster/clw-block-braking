@@ -40,8 +40,7 @@
   :process
   (lambda (_this)
     (cond ((stage-cleared-p)
-           (make-state :stage-clear
-                       :cleared-stage-number (slot-value _this 'stage-number)))
+           (make-state :stage-clear))
           ((slot-value _this 'gameover-p)
            (make-state :gameover))
           (t nil))))

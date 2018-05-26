@@ -14,23 +14,26 @@
                 :register-score)
   (:import-from :clw-block-braking/game/stage-generator
                 :get-max-stage-number)
+  (:import-from :clw-block-braking/game/stage-manager
+                :get-current-stage-number
+                :go-to-next-stage)
   (:import-from :clw-block-braking/game/timer
                 :get-current-sec))
 (in-package :clw-block-braking/game/state/stage-clear)
 
-(def-game-state stage-clear (cleared-stage-number)
+(def-game-state stage-clear ()
   :start-process
   (lambda (_this)
+    (declare (ignore _this))
     (stop-ball (get-current-ball))
-    (register-score :stage (slot-value _this 'cleared-stage-number)
+    (register-score :stage (get-current-stage-number)
                     :time (get-current-sec))
     t)
 
   :process
   (lambda (_this)
-    (let ((next-stage
-           (1+ (slot-value _this 'cleared-stage-number))))
-      (add-to-event-log next-stage)
-      (if (<= next-stage (get-max-stage-number))
+    (declare (ignore _this))
+    (let ((next-stage (go-to-next-stage)))
+      (if next-stage
           (make-state :interval :next-stage-number next-stage)
           (make-state :all-clear)))))

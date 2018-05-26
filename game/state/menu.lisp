@@ -4,12 +4,17 @@
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :make-game-menu-state)
+  (:import-from :clw-block-braking/game/state/menu_stage-selector
+                :init-stage-selector
+                :generate-stage-list)
   (:import-from :clw-block-braking/game/ui
                 :make-ui-component)
   (:import-from :clw-block-braking/game/state/utils
                 :make-state
                 :def-game-state))
 (in-package :clw-block-braking/game/state/menu)
+
+;; --- mouse --- ;;
 
 (defun.ps+ make-mouse-pointer ()
   (let ((mouse (make-ecs-entity))
@@ -25,6 +30,8 @@
                 (setf (point-2d-x point-2d) (get-mouse-x)
                       (point-2d-y point-2d) (get-mouse-y))))))
     mouse))
+
+;; --- menu --- ;;
 
 (def-game-state menu ((dummy-parent (make-ecs-entity))
                       next-state)
@@ -64,7 +71,11 @@
             (make-ui-component :on-click-up (lambda (_)
                                               (declare (ignore _))
                                               (setf (slot-value _this 'next-state)
-                                                    (make-state :init)))
+                                                    (make-state
+                                                     :init
+                                                     :stage-list
+                                                     (generate-stage-list
+                                                      (find-a-entity-by-tag :stage-selector)))))
                                :on-hover (lambda (_)
                                            (declare (ignore _))
                                            (enable-model-2d area
@@ -82,11 +93,14 @@
            (add-ecs-entity area dummy-parent)
            (disable-model-2d area :target-model-2d hover-model))))
       ;; mouse
-      (add-ecs-entity (make-mouse-pointer) dummy-parent))
+      (add-ecs-entity (make-mouse-pointer) dummy-parent)
+      ;; stage selector
+      (init-stage-selector dummy-parent
+                           :offset (make-point-2d :x 270 :y 370)))
     t)
 
   :process
-  (lambda (_this)
+  (lambda (_this) 
     (slot-value _this 'next-state))
 
   :end-process

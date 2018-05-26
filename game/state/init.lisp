@@ -20,16 +20,21 @@
                 :make-paddle)
   (:import-from :clw-block-braking/game/score-register
                 :init-score-register)
+  (:import-from :clw-block-braking/game/stage-manager
+                :make-stage-manager
+                :get-current-stage-number)
   (:import-from :clw-block-braking/game/timer
                 :init-timer)
   (:import-from :clw-block-braking/game/wall
                 :init-wall))
 (in-package :clw-block-braking/game/state/init)
 
-(def-game-state init ()
+(def-game-state init (stage-list)
   :start-process
   (lambda (_this)
-    (declare (ignore _this))
+    (add-to-event-log
+     (+ "Stage list: "
+        (slot-value _this 'stage-list)))
     (init-field)
     (init-controller)
     (let*  ((field (get-field))
@@ -41,10 +46,11 @@
       (init-life field))
     (init-timer)
     (init-score-register)
+    (add-ecs-entity (make-stage-manager (slot-value _this 'stage-list)))
     t)
 
   :process
   (lambda (_this)
     (declare (ignore _this))
     (make-state :main
-                :stage-number 1)))
+                :stage-number (get-current-stage-number))))
