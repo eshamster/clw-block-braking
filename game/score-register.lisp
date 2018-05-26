@@ -23,7 +23,8 @@
                                 stage time)
   (check-entity-tags score-register :score-register)
   (assert stage)
-  (assert time)
+  ;; Note: In JavaScript, 0 is interpreted as false.
+  (assert (not (null time)))
   (setf (gethash stage (get-entity-param score-register :register))
         (make-score :time time)))
 
