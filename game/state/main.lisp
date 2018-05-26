@@ -43,5 +43,11 @@
            (make-state :stage-clear))
           ((slot-value _this 'gameover-p)
            (make-state :gameover))
-          (t nil))))
+          (t nil)))
+
+  :end-process
+  (lambda (_this)
+    (declare (ignore _this))
+    (stop-timer)
+    t))
 
