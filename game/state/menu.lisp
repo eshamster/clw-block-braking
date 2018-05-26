@@ -5,7 +5,7 @@
         :cl-web-2d-game)
   (:export :make-game-menu-state)
   (:import-from :clw-block-braking/game/state/menu_stage-selector
-                :make-stage-selector
+                :init-stage-selector
                 :generate-stage-list)
   (:import-from :clw-block-braking/game/ui
                 :make-ui-component)
@@ -95,7 +95,8 @@
       ;; mouse
       (add-ecs-entity (make-mouse-pointer) dummy-parent)
       ;; stage selector
-      (add-ecs-entity (make-stage-selector) dummy-parent))
+      (init-stage-selector dummy-parent
+                           :offset (make-point-2d :x 270 :y 370)))
     t)
 
   :process
