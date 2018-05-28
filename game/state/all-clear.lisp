@@ -14,7 +14,9 @@
   (:import-from :clw-block-braking/game/score-register
                 :get-score
                 :score-time
-                :register-score)
+                :register-score
+                :update-best-record-p
+                :get-best-score)
   (:import-from :clw-block-braking/game/stage-generator
                 :get-max-stage-number)
   (:import-from :clw-block-braking/game/stage-manager
@@ -47,24 +49,28 @@
                                    :margin margin
                                    :x font-size
                                    :y (* (+ stage-count 5) (+ font-size margin)))))
+        ;; XXX: Adding text is invalid as CL code
         (let ((total-score 0)
               (stage-list (get-selected-stage-list)))
-          (dolist (stage stage-list)
-            (let ((score (get-score stage)))
+          (flet ((add-score-text (stage text)
+                   ;; TODO: Display "New!!" more drastically!
+                   (add-text-to-area area
+                                     :text (+ text " (Best: " (get-best-score stage)
+                                              (if (update-best-record-p stage)
+                                                  ") New!!"
+                                                  ")"))
+                                     :color #xff8800)))
+            (dolist (stage stage-list)
+              (let ((score (get-score stage)))
+                (add-score-text stage (+ "Stage" stage ": " score))
+                (incf total-score score)))
+            (when (> (length stage-list) 1)
+              (register-score :stage :all
+                              :time total-score)
               (add-text-to-area area
-                                ;; XXX: This is invalid as CL code
-                                :text (+ "Stage" stage ": " score)
-                                :color #xff8800)
-              (incf total-score score)))
-          (when (> (length stage-list) 1)
-            (register-score :stage :all
-                            :time total-score)
-            (add-text-to-area area
-                              :text "------"
-                              :color #xff0088)
-            (add-text-to-area area
-                              :text (+ "TOTAL: " total-score)
-                              :color #xff8800)))
+                                :text "------"
+                                :color #xff0088)
+              (add-score-text :all (+ "TOTAL: " total-score)))))
         (add-ecs-entity area field)))
     t)
 

@@ -7,7 +7,10 @@
            :register-score
            :get-score
            :score
-           :score-time))
+           :score-time
+
+           :get-best-score
+           :update-best-record-p))
 (in-package :clw-block-braking/game/score-register)
 
 ;; --- basic --- ;;
@@ -64,3 +67,23 @@
                   (< pre-new-value pre-old-value))
           (store-kvs old-key pre-new-value)))
       (store-kvs new-key (get-score stage score-register)))))
+
+(defun.ps+ get-stage-record (stage)
+  (with-kvs-prefix (*store-prefix*)
+    (list :new (read-kvs (+ "new-" stage))
+          :pre-max (read-kvs (+ "pre-max-" stage)))))
+
+(defun.ps+ update-best-record-p (stage)
+  (with-kvs-prefix (*store-prefix*)
+    (let ((record (get-stage-record stage)))
+      (or (null (getf record :pre-max))
+          (< (getf record :new)
+             (getf record :pre-max))))))
+
+(defun.ps+ get-best-score (stage)
+  (with-kvs-prefix (*store-prefix*)
+    (let ((record (get-stage-record stage)))
+      (if (null (getf record :pre-max))
+          (getf record :new)
+          (min (getf record :new)
+               (getf record :pre-max))))))
