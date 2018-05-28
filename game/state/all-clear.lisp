@@ -13,7 +13,8 @@
                 :field-height)
   (:import-from :clw-block-braking/game/score-register
                 :get-score
-                :score-time)
+                :score-time
+                :register-score)
   (:import-from :clw-block-braking/game/stage-generator
                 :get-max-stage-number)
   (:import-from :clw-block-braking/game/stage-manager
@@ -49,13 +50,15 @@
         (let ((total-score 0)
               (stage-list (get-selected-stage-list)))
           (dolist (stage stage-list)
-            (let ((score (score-time (get-score stage))))
+            (let ((score (get-score stage)))
               (add-text-to-area area
                                 ;; XXX: This is invalid as CL code
                                 :text (+ "Stage" stage ": " score)
                                 :color #xff8800)
               (incf total-score score)))
           (when (> (length stage-list) 1)
+            (register-score :stage :all
+                            :time total-score)
             (add-text-to-area area
                               :text "------"
                               :color #xff0088)
