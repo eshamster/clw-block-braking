@@ -29,8 +29,8 @@
 (defun.ps+ get-current-sec (&optional (timer (find-timer)))
   (let ((scale 10))
     (/ (floor (/ (* (get-entity-param timer :frame-count) scale)
-                                   60))
-                         scale)))
+                 60))
+       scale)))
 
 (defun.ps+ init-timer ()
   (let ((timer (make-ecs-entity)))
