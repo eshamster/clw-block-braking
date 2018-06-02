@@ -10,7 +10,8 @@
            :score-time
 
            :get-best-score
-           :update-best-record-p))
+           :update-best-record-p
+           :clear-best-score))
 (in-package :clw-block-braking/game/score-register)
 
 ;; --- basic --- ;;
@@ -87,3 +88,7 @@
           (getf record :new)
           (min (getf record :new)
                (getf record :pre-max))))))
+
+;; TODO: Enable to use this from menu
+(defun.ps+ clear-best-score ()
+  (clear-kvs-all))
