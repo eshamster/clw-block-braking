@@ -7,8 +7,14 @@
            :register-score
            :get-score
            :score
-           :score-time))
+           :score-time
+
+           :get-best-score
+           :update-best-record-p
+           :clear-best-score))
 (in-package :clw-block-braking/game/score-register)
+
+;; --- basic --- ;;
 
 (defstruct.ps+ score (time 0))
 
@@ -20,18 +26,22 @@
   (set-entity-param score-register :frame-count 0))
 
 (defun.ps+ register-score (&key (score-register (find-score-register))
-                                stage time)
+                                stage time
+                                (persist-p t))
   (check-entity-tags score-register :score-register)
   (assert stage)
   ;; Note: In JavaScript, 0 is interpreted as false.
   (assert (not (null time)))
   (setf (gethash stage (get-entity-param score-register :register))
-        (make-score :time time)))
+        (make-score :time time))
+  (when persist-p
+    (make-current-score-persist stage score-register)))
 
 (defun.ps+ get-score (stage &optional (score-register (find-score-register)))
   (check-entity-tags score-register :score-register)
   (let ((score (gethash stage (get-entity-param score-register :register))))
-    (if score score (make-score))))
+    (assert score)
+    (score-time score)))
 
 (defun.ps+ init-score-register ()
   (let ((score-register (make-ecs-entity)))
@@ -40,3 +50,45 @@
      score-register
      (init-entity-params :register (make-hash-table)))
     (add-ecs-entity score-register)))
+
+;; --- persistence --- ;;
+
+(defvar.ps+ *store-prefix* "clw-bb:score-")
+
+(defun.ps+ make-current-score-persist (stage &optional (score-register (find-score-register)))
+  (check-entity-tags score-register :score-register)
+  (with-kvs-prefix (*store-prefix*)
+    (let* ((new-key (+ "new-" stage))
+           (old-key (+ "pre-max-" stage))
+           (pre-new-value (read-kvs new-key))
+           (pre-old-value (read-kvs old-key)))
+      (unless (null pre-new-value)
+        ;; Less is better
+        (when (or (null pre-old-value)
+                  (< pre-new-value pre-old-value))
+          (store-kvs old-key pre-new-value)))
+      (store-kvs new-key (get-score stage score-register)))))
+
+(defun.ps+ get-stage-record (stage)
+  (with-kvs-prefix (*store-prefix*)
+    (list :new (read-kvs (+ "new-" stage))
+          :pre-max (read-kvs (+ "pre-max-" stage)))))
+
+(defun.ps+ update-best-record-p (stage)
+  (with-kvs-prefix (*store-prefix*)
+    (let ((record (get-stage-record stage)))
+      (or (null (getf record :pre-max))
+          (< (getf record :new)
+             (getf record :pre-max))))))
+
+(defun.ps+ get-best-score (stage)
+  (with-kvs-prefix (*store-prefix*)
+    (let ((record (get-stage-record stage)))
+      (if (null (getf record :pre-max))
+          (getf record :new)
+          (min (getf record :new)
+               (getf record :pre-max))))))
+
+;; TODO: Enable to use this from menu
+(defun.ps+ clear-best-score ()
+  (clear-kvs-all))
