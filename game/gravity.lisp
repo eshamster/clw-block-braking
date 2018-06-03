@@ -21,19 +21,20 @@
       :texture-name "gravity_block")
      (lambda (model)
        (let ((gravity-block (make-ecs-entity)))
-         (add-ecs-component-list
-          gravity-block
-          (make-point-2d)
-          (make-model-2d :model model
-                         :offset (make-point-2d :x (/ width -2)
-                                                :y (/ height -2))
-                         ;; TODO: parameterize
-                         :depth 100)
-          (make-script-2d :func (lambda (mine)
-                                  (when (not (has-entity-tag entity :gravity))
-                                    (register-next-frame-func
-                                     (lambda () (delete-ecs-entity mine)))))))
-         (add-ecs-entity gravity-block entity)))))
+         (when (find-the-entity entity)
+           (add-ecs-component-list
+            gravity-block
+            (make-point-2d)
+            (make-model-2d :model model
+                           :offset (make-point-2d :x (/ width -2)
+                                                  :y (/ height -2))
+                           ;; TODO: parameterize
+                           :depth 100)
+            (make-script-2d :func (lambda (mine)
+                                    (when (not (has-entity-tag entity :gravity))
+                                      (register-next-frame-func
+                                       (lambda () (delete-ecs-entity mine)))))))
+           (add-ecs-entity gravity-block entity))))))
   ;; range
   (draw-debug-point :point (make-point-2d)
                     :parent entity
@@ -45,6 +46,8 @@
 
 (defun.ps+ add-gravity-to-entity (entity)
   (check-type entity ecs-entity)
+  (unless (find-the-entity entity)
+    (return-from add-gravity-to-entity))
   (let ((pre-entity (find-a-entity-by-tag :gravity)))
     ;; only one block can have gravity
     (when pre-entity
