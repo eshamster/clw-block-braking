@@ -32,9 +32,6 @@
 (def-game-state init (stage-list)
   :start-process
   (lambda (_this)
-    (add-to-event-log
-     (+ "Stage list: "
-        (slot-value _this 'stage-list)))
     (init-field)
     (init-controller)
     (let*  ((field (get-field))

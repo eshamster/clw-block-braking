@@ -55,10 +55,8 @@
                (declare (ignore _))
                ;; XXX: Adhoc solution to avoid from adding total score to itself...
                (unless (eq stage :all)
-                 (let ((score (get-score stage score-register)))
-                   (add-to-event-log (+ stage ": " score))
-                   (incf scaled-result
-                         (* (get-score stage score-register) *truncate-scale*)))))
+                 (incf scaled-result
+                       (* (get-score stage score-register) *truncate-scale*))))
              (get-entity-param score-register :register))
     (/ scaled-result *truncate-scale*)))
 
