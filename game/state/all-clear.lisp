@@ -13,6 +13,7 @@
                 :field-height)
   (:import-from :clw-block-braking/game/score-register
                 :get-score
+                :get-total-score
                 :score-time
                 :register-score
                 :update-best-record-p
@@ -50,8 +51,7 @@
                                    :x font-size
                                    :y (* (+ stage-count 5) (+ font-size margin)))))
         ;; XXX: Adding text is invalid as CL code
-        (let ((total-score 0)
-              (stage-list (get-selected-stage-list)))
+        (let ((stage-list (get-selected-stage-list)))
           (flet ((add-score-text (stage text)
                    ;; TODO: Display "New!!" more drastically!
                    (add-text-to-area area
@@ -62,15 +62,15 @@
                                      :color #xff8800)))
             (dolist (stage stage-list)
               (let ((score (get-score stage)))
-                (add-score-text stage (+ "Stage" stage ": " score))
-                (incf total-score score)))
+                (add-score-text stage (+ "Stage" stage ": " score))))
             (when (> (length stage-list) 1)
-              (register-score :stage :all
-                              :time total-score)
-              (add-text-to-area area
-                                :text "------"
-                                :color #xff0088)
-              (add-score-text :all (+ "TOTAL: " total-score)))))
+              (let ((total-score (get-total-score)))
+                (register-score :stage :all
+                                :time total-score)
+                (add-text-to-area area
+                                  :text "------"
+                                  :color #xff0088)
+                (add-score-text :all (+ "TOTAL: " total-score))))))
         (add-ecs-entity area field)))
     t)
 

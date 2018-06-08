@@ -6,6 +6,7 @@
   (:export :init-score-register
            :register-score
            :get-score
+           :get-total-score
            :score
            :score-time
 
@@ -37,11 +38,29 @@
   (when persist-p
     (make-current-score-persist stage score-register)))
 
+(defvar.ps+ *truncate-scale* 10)
+
 (defun.ps+ get-score (stage &optional (score-register (find-score-register)))
   (check-entity-tags score-register :score-register)
   (let ((score (gethash stage (get-entity-param score-register :register))))
     (assert score)
-    (score-time score)))
+    (/ (floor (* (score-time score) *truncate-scale*))
+       *truncate-scale*)))
+
+(defun.ps+ get-total-score (&optional (score-register (find-score-register)))
+  "To avoid round-up error, use this rather than sum values of \"get-score\" by yourself"
+  (check-entity-tags score-register :score-register)
+  (let ((scaled-result 0))
+    (maphash (lambda (stage _)
+               (declare (ignore _))
+               ;; XXX: Adhoc solution to avoid from adding total score to itself...
+               (unless (eq stage :all)
+                 (let ((score (get-score stage score-register)))
+                   (add-to-event-log (+ stage ": " score))
+                   (incf scaled-result
+                         (* (get-score stage score-register) *truncate-scale*)))))
+             (get-entity-param score-register :register))
+    (/ scaled-result *truncate-scale*)))
 
 (defun.ps+ init-score-register ()
   (let ((score-register (make-ecs-entity)))
