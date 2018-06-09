@@ -23,6 +23,9 @@
     (load-texture :name "block-braking"
                   :path "/images/block_braking.png"
                   :alpha-path "/images/block_braking_alpha.png")
+    (load-texture :name "block-braking-gravity"
+                  :path "/images/block_braking_gravity.png"
+                  :alpha-path "/images/block_braking_gravity_alpha.png")
     (load-texture :name "paddle-marker-up"
                   :path "/images/paddle_marker.png"
                   :alpha-path "/images/paddle_marker_alpha.png"

@@ -14,7 +14,9 @@
 
 (defun.ps+ add-block-braking-animation (blk)
   (frame-promise-then
-   (get-texture-promise "block-braking")
+   (if (has-entity-tag blk :gravity)
+       (get-texture-promise "block-braking-gravity")
+       (get-texture-promise "block-braking"))
    (lambda (texture)
      (let* ((entity (make-ecs-entity))
             (scale 2)
