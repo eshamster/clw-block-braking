@@ -36,7 +36,8 @@
 (defvar.ps+
     *stage-sparse*
     '(:blocks ((:info (:name :mini-block :offset-x 2 :offset-y 3)
-                :sequences ((:min (0 0) :max (15 6) :step (5 3)))))))
+                :sequences ((:min (0 0) :max (15 6) :step (5 6))
+                            (:min (2.5 3) :max (12.5 3) :step (5 1)))))))
 
 (defvar.ps+
     *stage-dense*
