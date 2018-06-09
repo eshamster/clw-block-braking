@@ -232,6 +232,8 @@ Return reversed distance."
 
 (defun.ps+ process-collide (ball target)
   (check-entity-tags ball :ball)
+  (when (has-entity-tag target :gravity)
+    (return-from process-collide))
   (let ((rest-dist (reverse-ball-to-not-collide-point
                     ball target (get-entity-param ball :pre-point))))
     (cond ((or (has-entity-tag target :block)
