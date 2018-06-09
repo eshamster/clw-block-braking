@@ -24,6 +24,9 @@
                 :get-selected-stage-list))
 (in-package :clw-block-braking/game/state/all-clear)
 
+(defun.ps to-fixed-num (num digit)
+  (num.to-fixed digit))
+
 (def-game-state all-clear ((first-frame t))
   :start-process
   (lambda (_this)
@@ -52,17 +55,18 @@
                                    :y (* (+ stage-count 5) (+ font-size margin)))))
         ;; XXX: Adding text is invalid as CL code
         (let ((stage-list (get-selected-stage-list)))
-          (flet ((add-score-text (stage text)
+          (flet ((add-score-text (stage title score)
                    ;; TODO: Display "New!!" more drastically!
                    (add-text-to-area area
-                                     :text (+ text " (Best: " (get-best-score stage)
+                                     :text (+ title ": " (to-fixed-num score 1)
+                                              " (Best: " (to-fixed-num (get-best-score stage) 1)
                                               (if (update-best-record-p stage)
                                                   ") New!!"
                                                   ")"))
                                      :color #xff8800)))
             (dolist (stage stage-list)
               (let ((score (get-score stage)))
-                (add-score-text stage (+ "Stage" stage ": " score))))
+                (add-score-text stage (+ "Stage" stage) score)))
             (when (> (length stage-list) 1)
               (let ((total-score (get-total-score)))
                 (register-score :stage :all
@@ -70,7 +74,7 @@
                 (add-text-to-area area
                                   :text "------"
                                   :color #xff0088)
-                (add-score-text :all (+ "TOTAL: " total-score))))))
+                (add-score-text :all "TOTAL" total-score)))))
         (add-ecs-entity area field)))
     t)
 
