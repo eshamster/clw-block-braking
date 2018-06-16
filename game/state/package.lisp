@@ -1,6 +1,7 @@
 (defpackage clw-block-braking/game/state/package
   (:use :cl
         :ps-experiment
+        ;; The followings are required to make package-inferred-system to recognize them
         :clw-block-braking/game/state/all-clear
         :clw-block-braking/game/state/stage-clear
         :clw-block-braking/game/state/gameover
@@ -13,23 +14,8 @@
   (:import-from :cl-web-2d-game
                 :init-game-state)
   (:import-from :clw-block-braking/game/state/utils
-                :make-state
-                :register-state-maker))
+                :make-state))
 (in-package :clw-block-braking/game/state/package)
 
 (defun.ps+ init-clw-block-braking-state ()
-  (macrolet ((register-all (&rest target-list)
-               `(progn ,@(mapcar (lambda (target)
-                                   `(register-state-maker
-                                     ,target
-                                     (function ,(intern (format nil "MAKE-GAME-~A-STATE" target)))))
-                                 target-list))))
-    (register-all :all-clear
-                  :gameover
-                  :global-init
-                  :init
-                  :interval
-                  :main
-                  :menu
-                  :stage-clear))
   (init-game-state (make-state :global-init)))

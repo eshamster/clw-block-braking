@@ -5,10 +5,10 @@
 ("ps-experiment" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "ps-experiment" :repos "eshamster/ps-experiment" :ref nil :branch nil :tag nil)
-  :version "github-7f3b9a087f87bfa3432e5882332dacd6027bf1d6"
+  :version "github-bee59d163f0f15c31fb44d6bb03917903677759e"
   :repos "eshamster/ps-experiment"
-  :url "https://github.com/eshamster/ps-experiment/archive/7f3b9a087f87bfa3432e5882332dacd6027bf1d6.tar.gz"
-  :ref "7f3b9a087f87bfa3432e5882332dacd6027bf1d6"))
+  :url "https://github.com/eshamster/ps-experiment/archive/bee59d163f0f15c31fb44d6bb03917903677759e.tar.gz"
+  :ref "bee59d163f0f15c31fb44d6bb03917903677759e"))
 ("cl-ps-ecs" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "cl-ps-ecs" :repos "eshamster/cl-ps-ecs" :ref nil :branch nil :tag nil)

@@ -3,8 +3,7 @@
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
-  (:export :register-state-maker
-           :make-state
+  (:export :make-state
            :def-game-state
 
            :get-current-ball
@@ -26,7 +25,7 @@
 
 ;; --- (experimental macro) --- ;;
 
-(defmacro.ps+ def-game-state (name (&rest params) &key start-process process end-process)
+(defmacro def-game-state (name (&rest params) &key start-process process end-process)
   `(progn
      (defstruct.ps+
          (,(intern (format nil "GAME-~A-STATE" name))
@@ -37,7 +36,11 @@
                                  `((process ,process)))
                                (when end-process
                                  `((end-process ,end-process))))))
-         ,@params)))
+         ,@params)
+     (def-top-level-form.ps+ ,(intern (format nil "GAME-STATE-REGISTER-~A" name))
+       (register-state-maker
+        ,(intern (symbol-name name) (find-package "KEYWORD"))
+        (function ,(intern (format nil "MAKE-GAME-~A-STATE" name)))))))
 
 ;; --- other utils --- ;;
 
