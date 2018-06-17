@@ -4,9 +4,6 @@
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :make-game-init-state)
-  (:import-from :clw-block-braking/game/state/utils
-                :make-state
-                :def-game-state)
   (:import-from :clw-block-braking/game/ball
                 :make-ball)
   (:import-from :clw-block-braking/game/controller

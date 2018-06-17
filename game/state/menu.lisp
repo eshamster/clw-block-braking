@@ -8,10 +8,7 @@
                 :init-stage-selector
                 :generate-stage-list)
   (:import-from :clw-block-braking/game/ui
-                :make-ui-component)
-  (:import-from :clw-block-braking/game/state/utils
-                :make-state
-                :def-game-state))
+                :make-ui-component))
 (in-package :clw-block-braking/game/state/menu)
 
 ;; --- mouse --- ;;

@@ -5,8 +5,6 @@
         :cl-web-2d-game)
   (:export :make-game-gameover-state)
   (:import-from :clw-block-braking/game/state/utils
-                :make-state
-                :def-game-state
                 :delete-all-entities-in-next-frame))
 (in-package :clw-block-braking/game/state/gameover)
 

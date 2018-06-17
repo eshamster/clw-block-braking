@@ -3,44 +3,12 @@
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
-  (:export :make-state
-           :def-game-state
-
-           :get-current-ball
+  (:export :get-current-ball
            :reset-ball-on-field
            :delete-all-entities-in-next-frame)
   (:import-from :clw-block-braking/game/ball
                 :reset-ball))
 (in-package :clw-block-braking/game/state/utils)
-
-;; --- state management utils --- ;;
-
-(defvar.ps+ *state-maker-table* (make-hash-table))
-
-(defun.ps+ make-state (kind &rest keys)
-  (apply (gethash kind *state-maker-table*) keys))
-
-(defun.ps+ register-state-maker (kind func)
-  (setf (gethash kind *state-maker-table*) func))
-
-;; --- (experimental macro) --- ;;
-
-(defmacro def-game-state (name (&rest params) &key start-process process end-process)
-  `(progn
-     (defstruct.ps+
-         (,(intern (format nil "GAME-~A-STATE" name))
-           (:include game-state
-                     ,@(append (when start-process
-                                 `((start-process ,start-process)))
-                               (when process
-                                 `((process ,process)))
-                               (when end-process
-                                 `((end-process ,end-process))))))
-         ,@params)
-     (def-top-level-form.ps+ ,(intern (format nil "GAME-STATE-REGISTER-~A" name))
-       (register-state-maker
-        ,(intern (symbol-name name) (find-package "KEYWORD"))
-        (function ,(intern (format nil "MAKE-GAME-~A-STATE" name)))))))
 
 ;; --- other utils --- ;;
 

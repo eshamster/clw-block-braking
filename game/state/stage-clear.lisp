@@ -5,8 +5,6 @@
         :cl-web-2d-game)
   (:export :make-game-stage-clear-state)
   (:import-from :clw-block-braking/game/state/utils
-                :make-state
-                :def-game-state
                 :get-current-ball)
   (:import-from :clw-block-braking/game/ball
                 :stop-ball)

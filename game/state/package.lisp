@@ -12,8 +12,7 @@
         :clw-block-braking/game/state/menu)
   (:export init-clw-block-braking-state)
   (:import-from :cl-web-2d-game
-                :init-game-state)
-  (:import-from :clw-block-braking/game/state/utils
+                :init-game-state
                 :make-state))
 (in-package :clw-block-braking/game/state/package)
 

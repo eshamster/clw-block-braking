@@ -3,10 +3,7 @@
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
-  (:export :make-game-global-init-state)
-  (:import-from :clw-block-braking/game/state/utils
-                :make-state
-                :def-game-state))
+  (:export :make-game-global-init-state))
 (in-package :clw-block-braking/game/state/global-init)
 
 (def-game-state global-init ()

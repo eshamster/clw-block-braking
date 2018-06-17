@@ -5,8 +5,6 @@
         :cl-web-2d-game)
   (:export :make-game-interval-state)
   (:import-from :clw-block-braking/game/state/utils
-                :make-state
-                :def-game-state
                 :reset-ball-on-field)
   (:import-from :clw-block-braking/game/timer
                 :reset-timer))
