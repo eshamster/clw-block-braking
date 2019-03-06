@@ -23,5 +23,8 @@
 (defun.ps+ delete-all-entities-in-next-frame ()
   (do-ecs-entities entity
     (unless (ecs-entity-parent entity)
-      (register-next-frame-func
-       (lambda () (delete-ecs-entity entity))))))
+      ;; Note: Without the following (shallow) copy,
+      ;; all registered functions wrongly share a same entity.
+      (let ((entity-copy entity))
+        (register-next-frame-func
+         (lambda () (delete-ecs-entity entity-copy)))))))
