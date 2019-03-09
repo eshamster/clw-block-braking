@@ -10,8 +10,7 @@
 
 (def-game-state gameover ((first-frame t))
   :start-process
-  (lambda (_this)
-    (declare (ignore _this))
+  (state-lambda ()
     (let* ((font-size 25)
            (margin 20)
            (area (make-text-area :font-size font-size :text-align :center
@@ -27,16 +26,14 @@
     t)
 
   :process
-  (lambda (_this)
-    (declare (ignore _this))
+  (state-lambda ()
     (when (eq (get-left-mouse-state) :down-now)
       (make-state :menu)))
 
   :end-process
-  (lambda (_this)
-    (with-slots (first-frame) _this
-      (if first-frame
-          (progn (delete-all-entities-in-next-frame)
-                 (setf first-frame nil)
-                 nil)
-          t))))
+  (state-lambda (first-frame)
+    (if first-frame
+        (progn (delete-all-entities-in-next-frame)
+               (setf first-frame nil)
+               nil)
+        t)))

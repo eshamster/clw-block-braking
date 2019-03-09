@@ -33,7 +33,7 @@
 (def-game-state menu ((dummy-parent (make-ecs-entity))
                       next-state)
   :start-process
-  (lambda (_this)
+  (state-lambda (dummy-parent next-state)
     (let* ((font-size 25)
            (margin 20)
            (center-x (/ (get-screen-width) 2))
@@ -42,8 +42,7 @@
            (area (make-text-area :font-size font-size :text-align :center
                                  :margin margin
                                  :x center-x
-                                 :y top-y))
-           (dummy-parent (slot-value _this 'dummy-parent)))
+                                 :y top-y)))
       ;; dummy parent
       (add-ecs-entity dummy-parent)
       ;; text area
@@ -67,7 +66,7 @@
             area
             (make-ui-component :on-click-up (lambda (_)
                                               (declare (ignore _))
-                                              (setf (slot-value _this 'next-state)
+                                              (setf next-state
                                                     (make-state
                                                      :init
                                                      :stage-list
@@ -97,10 +96,10 @@
     t)
 
   :process
-  (lambda (_this) 
-    (slot-value _this 'next-state))
+  (state-lambda (next-state)
+    next-state)
 
   :end-process
-  (lambda (_this)
-    (delete-ecs-entity (slot-value _this 'dummy-parent))
+  (state-lambda (dummy-parent)
+    (delete-ecs-entity dummy-parent)
     t))

@@ -8,8 +8,7 @@
 
 (def-game-state global-init ()
   :start-process
-  (lambda (_this)
-    (declare (ignore _this))
+  (state-lambda ()
     (load-font "js/")
     (load-texture :name "block"
                   :path "/images/block.png"
@@ -38,6 +37,5 @@
     t)
 
   :process
-  (lambda (_this)
-    (declare (ignore _this))
+  (state-lambda ()
     (make-state :menu)))

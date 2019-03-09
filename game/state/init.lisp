@@ -28,7 +28,7 @@
 
 (def-game-state init (stage-list)
   :start-process
-  (lambda (_this)
+  (state-lambda (stage-list)
     (init-field)
     (init-controller)
     (let*  ((field (get-field))
@@ -40,11 +40,10 @@
       (init-life field))
     (init-timer)
     (init-score-register)
-    (add-ecs-entity (make-stage-manager (slot-value _this 'stage-list)))
+    (add-ecs-entity (make-stage-manager stage-list))
     t)
 
   :process
-  (lambda (_this)
-    (declare (ignore _this))
+  (state-lambda ()
     (make-state :main
                 :stage-number (get-current-stage-number))))

@@ -22,30 +22,28 @@
 
 (def-game-state main (stage-number (gameover-p nil))
   :start-process
-  (lambda (_this)
+  (state-lambda (stage-number gameover-p)
     (let*  ((field (get-field)))
-      (generate-stage (slot-value _this 'stage-number)
-                      field))
+      (generate-stage stage-number field))
     (add-life-decrease-event
      :reset-or-gameover
      (lambda (rest-life)
        (if (>= rest-life 0)
            (reset-ball-on-field)
-           (setf (game-main-state-gameover-p _this) t))))
+           (setf gameover-p t))))
     (start-timer)
     t)
 
   :process
-  (lambda (_this)
+  (state-lambda (gameover-p)
     (cond ((stage-cleared-p)
            (make-state :stage-clear))
-          ((slot-value _this 'gameover-p)
+          (gameover-p
            (make-state :gameover))
           (t nil)))
 
   :end-process
-  (lambda (_this)
-    (declare (ignore _this))
+  (state-lambda ()
     (stop-timer)
     t))
 

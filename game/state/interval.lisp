@@ -13,8 +13,8 @@
 (def-game-state interval ((parent-entity (make-ecs-entity))
                           next-stage-number)
   :start-process
-  (lambda (_this)
-    (let* ((parent (slot-value _this 'parent-entity))
+  (state-lambda (parent-entity)
+    (let* ((parent parent-entity)
            (font-size 25)
            (margin 20)
            (area (make-text-area :font-size font-size :text-align :center
@@ -33,15 +33,14 @@
     t)
 
   :process
-  (lambda (_this)
+  (state-lambda (next-stage-number)
     (when (eq (get-left-mouse-state) :down-now)
       (make-state :main
-                  :stage-number (slot-value _this 'next-stage-number))))
+                  :stage-number next-stage-number)))
 
   :end-process
-  (lambda (_this)
+  (state-lambda (parent-entity)
     (reset-timer)
     (reset-ball-on-field)
-    (delete-ecs-entity
-     (slot-value _this 'parent-entity))
+    (delete-ecs-entity parent-entity)
     t))

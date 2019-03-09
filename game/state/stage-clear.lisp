@@ -21,16 +21,14 @@
 
 (def-game-state stage-clear ()
   :start-process
-  (lambda (_this)
-    (declare (ignore _this))
+  (state-lambda ()
     (stop-ball (get-current-ball))
     (register-score :stage (get-current-stage-number)
                     :time (get-current-sec))
     t)
 
   :process
-  (lambda (_this)
-    (declare (ignore _this))
+  (state-lambda ()
     (let ((next-stage (go-to-next-stage)))
       (if next-stage
           (make-state :interval :next-stage-number next-stage)
