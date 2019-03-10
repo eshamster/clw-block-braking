@@ -1,5 +1,6 @@
 (defpackage clw-block-braking/game/state/all-clear
   (:use :cl
+        :parenscript
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
@@ -23,7 +24,10 @@
 (in-package :clw-block-braking/game/state/all-clear)
 
 (defun.ps to-fixed-num (num digit)
-  (num.to-fixed digit))
+  (if (string= (typeof num) "string")
+      (chain (parse-float num)
+             (to-fixed digit))
+      (num.to-fixed digit)))
 
 (def-game-state all-clear ((first-frame t))
   :start-process
