@@ -5,8 +5,6 @@
         :cl-web-2d-game)
   (:export :generate-stage-list
            :init-stage-selector)
-  (:import-from :clw-block-braking/game/ui
-                :make-ui-component)
   (:import-from :clw-block-braking/game/stage-generator
                 :get-max-stage-number))
 (in-package :clw-block-braking/game/state/menu_stage-selector)
@@ -63,8 +61,7 @@
                          (make-point-2d :x 0 :y height)))
         (make-ui-component
          :on-click-up
-         (lambda (_)
-           (declare (ignore _))
+         (lambda ()
            (increment-selector selector (if increase-p 1 -1)))))
        (add-ecs-entity incrementor selector)))))
 

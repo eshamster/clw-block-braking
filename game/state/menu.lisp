@@ -6,9 +6,7 @@
   (:export :make-game-menu-state)
   (:import-from :clw-block-braking/game/state/menu_stage-selector
                 :init-stage-selector
-                :generate-stage-list)
-  (:import-from :clw-block-braking/game/ui
-                :make-ui-component))
+                :generate-stage-list))
 (in-package :clw-block-braking/game/state/menu)
 
 ;; --- mouse --- ;;
@@ -64,22 +62,19 @@
                                             :depth 100)))
            (add-ecs-component-list
             area
-            (make-ui-component :on-click-up (lambda (_)
-                                              (declare (ignore _))
-                                              (setf next-state
-                                                    (make-state
-                                                     :init
-                                                     :stage-list
-                                                     (generate-stage-list
-                                                      (find-a-entity-by-tag :stage-selector)))))
-                               :on-hover (lambda (_)
-                                           (declare (ignore _))
-                                           (enable-model-2d area
-                                                            :target-model-2d hover-model))
-                               :on-not-hover (lambda (_)
-                                               (declare (ignore _))
-                                               (disable-model-2d area
-                                                                 :target-model-2d hover-model)))
+            (make-ui-component
+             :on-click-up (lambda ()
+                            (setf next-state
+                                  (make-state
+                                   :init
+                                   :stage-list (generate-stage-list
+                                                (find-a-entity-by-tag :stage-selector)))))
+             :on-mouse-hover (lambda ()
+                               (enable-model-2d
+                                area :target-model-2d hover-model))
+             :on-mouse-not-hover (lambda ()
+                                   (disable-model-2d
+                                    area :target-model-2d hover-model)))
             (make-physic-polygon
              :pnt-list (list (make-vector-2d :x (* -1 h-width) :y (- (* -1 height) margin))
                              (make-vector-2d :x h-width :y (- (* -1 height) margin))

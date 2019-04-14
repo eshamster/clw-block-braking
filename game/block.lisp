@@ -4,8 +4,6 @@
         :cl-ps-ecs
         :cl-web-2d-game)
   (:export :make-rect-block)
-  (:import-from :clw-block-braking/game/ui
-                :make-ui-component)
   (:import-from :clw-block-braking/game/field
                 :field-width
                 :field-height
@@ -56,14 +54,13 @@
     (add-ecs-component-list
      blk
      hover-model
-     (make-ui-component :on-hover (lambda (_)
-                                    (declare (ignore _))
-                                    (enable-model-2d blk
-                                                     :target-model-2d hover-model))
-                        :on-not-hover (lambda (_)
-                                        (declare (ignore _))
-                                        (disable-model-2d blk
-                                                          :target-model-2d hover-model))))
+     (make-ui-component
+      :on-mouse-hover (lambda ()
+                        (enable-model-2d
+                         blk :target-model-2d hover-model))
+      :on-mouse-not-hover (lambda ()
+                            (disable-model-2d
+                             blk :target-model-2d hover-model))))
     (disable-model-2d blk :target-model-2d hover-model)
     blk))
 
