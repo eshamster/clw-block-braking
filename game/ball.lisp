@@ -23,13 +23,13 @@
 ;; --- gravity --- ;;
 
 (defun.ps+ incf-gravity (gravity-point target-point target-vector)
-  (let ((pre-abs (vector-abs target-vector))
-        (accell (setf-vector-abs
-                 (decf-vector (clone-vector-2d gravity-point)
-                              target-point)
+  (let ((pre-abs (vector-2d-abs target-vector))
+        (accell (setf-vector-2d-abs
+                 (decf-vector-2d (clone-vector-2d gravity-point)
+                                 target-point)
                  (get-param :gravity :value))))
-    (incf-vector target-vector accell)
-    (setf-vector-abs target-vector pre-abs)))
+    (incf-vector-2d target-vector accell)
+    (setf-vector-2d-abs target-vector pre-abs)))
 
 (defun.ps+ find-gravity-entity ()
   (find-a-entity-by-tag :gravity))
@@ -61,14 +61,14 @@
 (defun.ps+ reflect-by-vertical (ball)
   (check-entity-tags ball :ball)
   (let* ((speed (get-entity-param ball :speed))
-         (angle (vector-angle speed)))
-    (setf-vector-angle speed (- PI angle))))
+         (angle (vector-2d-angle speed)))
+    (setf-vector-2d-angle speed (- PI angle))))
 
 (defun.ps+ reflect-by-horizontal (ball)
   (check-entity-tags ball :ball)
   (let* ((speed (get-entity-param ball :speed))
-         (angle (vector-angle speed)))
-    (setf-vector-angle speed (* angle -1))))
+         (angle (vector-2d-angle speed)))
+    (setf-vector-2d-angle speed (* angle -1))))
 
 (defun.ps+ move-ball-normally (ball)
   (check-entity-tags ball :ball)
@@ -117,8 +117,8 @@
     (set-entity-param ball :on-paddle-p nil)
     (let ((speed (get-entity-param ball :speed))
           (speed-abs (calc-current-base-speed-abs ball)))
-      (setf-vector-abs speed speed-abs)
-      (setf-vector-angle speed (/ PI 3.9))
+      (setf-vector-2d-abs speed speed-abs)
+      (setf-vector-2d-angle speed (/ PI 3.9))
       (set-entity-param ball :basic-speed-abs speed-abs))))
 
 (defun.ps+ move-ball (ball)
@@ -132,9 +132,9 @@
          (new-base-speed-abs (calc-current-base-speed-abs ball))
          (speed (get-entity-param ball :speed)))
     (set-entity-param ball :basic-speed-abs new-base-speed-abs)
-    (setf-vector-abs speed
-                     (+ (vector-abs speed)
-                        (- new-base-speed-abs pre-base-speed-abs)))
+    (setf-vector-2d-abs speed
+                        (+ (vector-2d-abs speed)
+                           (- new-base-speed-abs pre-base-speed-abs)))
     (let ((grav-entity (find-gravity-entity)))
       (when grav-entity
         (add-gravity-effect ball grav-entity)))))
@@ -185,14 +185,14 @@
          (min-angle-abs (get-param :ball :angle :min))
          ;; current
          (speed (get-entity-param ball :speed))
-         (current-angle (vector-angle speed)))
-    (setf-vector-angle speed
-                       (max min-angle-abs
-                            (min (- PI min-angle-abs)
-                                 ;; diff-angle is used for normalization
-                                 (diff-angle
-                                  (- current-angle changed-angle)
-                                  0))))))
+         (current-angle (vector-2d-angle speed)))
+    (setf-vector-2d-angle speed
+                          (max min-angle-abs
+                               (min (- PI min-angle-abs)
+                                    ;; diff-angle is used for normalization
+                                    (diff-angle
+                                     (- current-angle changed-angle)
+                                     0))))))
 
 (defun.ps+ reflect-to-paddle (ball paddle)
   (check-entity-tags ball :ball)
@@ -253,7 +253,7 @@ Return reversed distance."
           (t (error "Collides to unknown object.")))
     ;; proceed rest distance
     (let ((point (get-ecs-component 'point-2d ball))
-          (angle (vector-angle (get-entity-param ball :speed))))
+          (angle (vector-2d-angle (get-entity-param ball :speed))))
       (incf (point-2d-x point) (* rest-dist (cos angle)))
       (incf (point-2d-y point) (* rest-dist (sin angle))))))
 
