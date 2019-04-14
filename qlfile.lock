@@ -5,21 +5,21 @@
 ("ps-experiment" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "ps-experiment" :repos "eshamster/ps-experiment" :ref nil :branch nil :tag nil)
-  :version "github-931224b16e08943d1d982b4eaa6894757d682a84"
+  :version "github-823c27bb650de1381668c7298e401f907fec529f"
   :repos "eshamster/ps-experiment"
-  :url "https://github.com/eshamster/ps-experiment/archive/931224b16e08943d1d982b4eaa6894757d682a84.tar.gz"
-  :ref "931224b16e08943d1d982b4eaa6894757d682a84"))
+  :url "https://github.com/eshamster/ps-experiment/archive/823c27bb650de1381668c7298e401f907fec529f.tar.gz"
+  :ref "823c27bb650de1381668c7298e401f907fec529f"))
 ("cl-ps-ecs" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "cl-ps-ecs" :repos "eshamster/cl-ps-ecs" :ref nil :branch nil :tag nil)
-  :version "github-20cf6d59e6e5fd677a5dc575af6a6990ede06db5"
+  :version "github-1e88041de8dfd631084231f82a040f080766d28c"
   :repos "eshamster/cl-ps-ecs"
-  :url "https://github.com/eshamster/cl-ps-ecs/archive/20cf6d59e6e5fd677a5dc575af6a6990ede06db5.tar.gz"
-  :ref "20cf6d59e6e5fd677a5dc575af6a6990ede06db5"))
+  :url "https://github.com/eshamster/cl-ps-ecs/archive/1e88041de8dfd631084231f82a040f080766d28c.tar.gz"
+  :ref "1e88041de8dfd631084231f82a040f080766d28c"))
 ("cl-web-2d-game" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "cl-web-2d-game" :repos "eshamster/cl-web-2d-game" :ref nil :branch nil :tag nil)
-  :version "github-b072461c14884cb190262772a707d64b0a7d04cf"
+  :version "github-32dc59622548f97f7ac64b22aeb83b138eb1517d"
   :repos "eshamster/cl-web-2d-game"
-  :url "https://github.com/eshamster/cl-web-2d-game/archive/b072461c14884cb190262772a707d64b0a7d04cf.tar.gz"
-  :ref "b072461c14884cb190262772a707d64b0a7d04cf"))
+  :url "https://github.com/eshamster/cl-web-2d-game/archive/32dc59622548f97f7ac64b22aeb83b138eb1517d.tar.gz"
+  :ref "32dc59622548f97f7ac64b22aeb83b138eb1517d"))

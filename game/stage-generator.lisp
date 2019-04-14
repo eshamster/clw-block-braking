@@ -3,7 +3,7 @@
         :ps-experiment
         :cl-ps-ecs
         :cl-web-2d-game)
-  (:export :generate-stage
+  (:export :generate-bb-stage
            :get-max-stage-number)
   (:import-from :clw-block-braking/game/block
                 :make-rect-block)
@@ -97,7 +97,7 @@
                                                 :y (/ height -2))))))
       result)))
 
-(defun.ps+ generate-stage (stage-number field)
+(defun.ps+ generate-bb-stage (stage-number field)
   (dolist (cluster (getf (get-stage-info stage-number) :blocks))
     (let* ((info (getf cluster :info))
            (name (getf info :name))

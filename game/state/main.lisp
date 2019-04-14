@@ -11,7 +11,7 @@
   (:import-from :clw-block-braking/game/life
                 :add-life-decrease-event)
   (:import-from :clw-block-braking/game/stage-generator
-                :generate-stage)
+                :generate-bb-stage)
   (:import-from :clw-block-braking/game/timer
                 :start-timer
                 :stop-timer))
@@ -24,7 +24,7 @@
   :start-process
   (state-lambda (stage-number gameover-p)
     (let*  ((field (get-field)))
-      (generate-stage stage-number field))
+      (generate-bb-stage stage-number field))
     (add-life-decrease-event
      :reset-or-gameover
      (lambda (rest-life)
