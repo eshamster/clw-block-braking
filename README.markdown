@@ -35,11 +35,11 @@ $ qlot install
 ## Screenshots
 ### Change ball speed
 
-TODO: Add screenshot
+![Demo of changing ball speed](https://user-images.githubusercontent.com/11023733/59144849-02f4f680-8a17-11e9-8e58-b6bb281bdc62.gif)
 
 ### Add gravity to block
 
-TODO: Add screenshot
+![Demo of adding gravity](https://user-images.githubusercontent.com/11023733/59144854-07b9aa80-8a17-11e9-96cb-4a8426b1611e.gif)
 
 ## Author
 
