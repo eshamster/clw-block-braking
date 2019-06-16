@@ -1,4 +1,6 @@
-# clw-block-braking - A block braking game with gravity written by Common Lisp as Web application
+# clw-block-braking
+
+A block braking game with gravity written by Common Lisp as Web application using [cl-web-2d-game](https://github.com/eshamster/cl-web-2d-game).
 
 ## Usage
 
