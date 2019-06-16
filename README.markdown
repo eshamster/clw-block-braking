@@ -10,7 +10,7 @@ A block braking game with gravity written by Common Lisp as Web application usin
 > (clw-block-braking:start :port <port number>)
 ```
 
-After starting, you can access to the tetris by `http://localhost:<port number>` using a web browser.
+After starting, you can access to the game by `http://localhost:<port number>` using a web browser.
 
 
 ## Installation
@@ -19,8 +19,8 @@ This project depends on liblaries that are not registered in the quicklisp repos
 
 ```bash
 # Under a directory managed by quicklisp
-$ git clone https://github.com/eshamster/clw-tetris.git
-$ cd clw-tetris
+$ git clone https://github.com/eshamster/clw-block-braking.git
+$ cd clw-block-braking
 $ ros install qlot # if you haven't installed
 $ qlot install
 ```
